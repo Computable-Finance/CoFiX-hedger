@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CoFiX Automatic Hedging Program</title>
+
+    <style>
+        .line {
+            border-bottom: 0.5px dotted white;
+        }
+    </style>
+</head>
+<body class="bk">
+<div style="text-align: center">
+    <h2>CoFiX Automatic Hedging Program</h2>
+    <div style="text-align: left;display: inline-block;">
+        <p class="line"></p>
+        <label>The current node: </label><label th:text=${node}></label>
+        <p></p>
+        <label>Wallet Address: </label><label th:text=${address}></label>
+        <p></p>
+        <label>Hedging interval: </label><label th:text=${interval}></label>
+        <p></p>
+        <label>The ethThreshold: </label><label th:text=${ethThreshold}></label>
+        <p></p>
+        <label>The usdtThreshold: </label><label th:text=${usdtThreshold}></label>
+        <p></p>
+        <label>The hbtcThreshold: </label><label th:text=${hbtcThreshold}></label>
+        <p></p>
+        <div th:if="${proxyPort>0}">
+            <p></p>
+            <label>Proxy ip: </label><label th:text=${proxyIp}></label>
+            <p></p>
+            <label>Proxy port: </label><label th:text=${proxyPort}></label>
+            <p></p>
+        </div>
+        <p></p>
+        <p class="line"></p>
+
+        <label>Setting up ethereum nodes (required): </label>
+        <form id="updateNode">
+            <input type="text" name="node" id="node" autocomplete="off">
+            <input type="button" onclick="updateNode()" value="submit"/>
+        </form>
+
+
+        <label>Set the network agent address and port (not required): </label>
+        <form id="updateProxy">
+            <input type="text" name="proxyIp" id="proxyIp" autocomplete="off" placeholder="Proxy IP, default is 127.0.0.1">
+            <input type="text" name="proxyPort" id="proxyPort" autocomplete="off" placeholder="Proxy port, default is 1087">
+            <input type="button" onclick="updateProxy()" value="submit"/>
+        </form>
+
+
+        <label>Set the private key (required): </label>
+        <form id="updatePrivateKey">
+            <input type="text" name="privateKey" id="privateKey" autocomplete="off">
+            <input type="button" onclick="updatePrivateKey()" value="submit"/>
+        </form>
+
+        <label>Set the hedging interval(default: 20s): </label>
+        <form id="updateInterval">
+            <input type="number" name="interval" id="interval" autocomplete="off">
+            <input type="button" onclick="updateInterval()" value="submit"/>
+        </form>
+
+
+        <p class="line"></p>
+        <form id="updateExchangeApiKey">
+            <label>Enter huobi API-KEY</label>
+            <p></p>
+            <input type="text" name="apiKey" autocomplete="off">
+            <p></p>
+            <label>Enter huobi API-SECRET</label>
+            <p></p>
+            <input type="text" name="apiSecret" autocomplete="off">
+            <p></p>
+            <input type="button" onclick="updateExchangeApiKey()" value="submit"/>
+        </form>
+
+        <p class="line"></p>
+
+        <form id="updateThreshold">
+            <label>Enter eth threshold</label>
+            <p></p>
+            <input type="text" name="ethThreshold" id="ethThreshold" autocomplete="off">
+            <p></p>
+            <label>Enter usdt threshold</label>
+            <p></p>
+            <input type="text" name="usdtThreshold" id="usdtThreshold" autocomplete="off">
+            <p></p>
+            <label>Enter hbtc threshold</label>
+            <p></p>
+            <input type="text" name="hbtcThreshold" id="hbtcThreshold" autocomplete="off">
+            <p></p>
+            <input type="button" onclick="updateThreshold()" value="submit"/>
+        </form>
+
+<!--
+        <form id="updatePasswd">
+            <label>Enter user password</label>
+            <p></p>
+            <input type="text" name="userPasswd" id="userPasswd" autocomplete="off">
+            <input type="button" onclick="updatePasswd()" value="submit"/>
+        </form>
+-->
+    </div>
+
+    <p class="line"/>
+    <label th:text=${start}></label>
+    <button onclick="startHedging()">Hedging</button>
+
+</div>
+</body>
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript">
+
+    function updateThreshold(){
+        var ethThreshold = document.getElementById("ethThreshold").value;
+        var usdtThreshold = document.getElementById("usdtThreshold").value;
+        var hbtcThreshold = document.getElementById("hbtcThreshold").value;
+        if (!ethThreshold) {
+            alert("The EthThreshold cannot be empty")
+            return false;
+        }
+        if (!usdtThreshold) {
+            alert("The UsdtThreshold cannot be empty")
+            return false;
+        }
+
+        if (!hbtcThreshold) {
+            alert("The HbtcThreshold cannot be empty")
+            return false;
+        }
+
+        $.ajax({
+            type:"POST",
+            url:"/hedging/updateThreshold",
+            data:$('#updateThreshold').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success:function(result){
+                location.replace(location);
+            },
+            error:function(){
+                alert("Error !!")
+            }
+        })
+    }
+
+    function updateProxy() {
+        var proxyPort = document.getElementById("proxyPort").value;
+        if (!proxyPort) {
+            alert("The proxy port cannot be empty")
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/hedging/updateProxy",
+            data: $('#updateProxy').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success: function (result) {
+                location.reload();
+            },
+            error: function () {
+                alert("Please enter the correct agent port and address!!")
+            }
+        })
+    }
+
+    function updateExchangeApiKey(){
+        $.ajax({
+            type:"POST",
+            url:"/hedging/updateExchangeApiKey",
+            data:$('#updateExchangeApiKey').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success:function(result){
+                location.replace(location);
+            },
+            error:function(){
+                alert("Please enter the correct API-Key !!")
+            }
+        })
+    }
+
+    function updatePasswd() {
+        let passwd = document.getElementById("userPasswd").value;
+        if (!passwd) {
+            alert("The password cannot be empty")
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/auth/update-passwd",
+            data: $('#updatePasswd').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success: function (result) {
+                location.reload();
+            },
+            error: function () {
+                alert("Please enter the correct node address!!")
+            }
+        })
+    }
+
+    function updateNode() {
+        var node = document.getElementById("node").value;
+        if (!node) {
+            alert("The node cannot be empty")
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/hedging/updateNode",
+            data: $('#updateNode').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success: function (result) {
+                location.reload();
+            },
+            error: function () {
+                alert("Please enter the correct node address!!")
+            }
+        })
+    }
+
+    var node = '[[${node}]]';
+    var address = '[[${address}]]';
+
+    function updateInterval() {
+        if (!node) {
+            alert("Please set the node first");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/hedging/updateInterval",
+            data: $('#updateInterval').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success: function (result) {
+                location.reload();
+            },
+            error: function () {
+                alert("Please enter the correct interval!!")
+            }
+        })
+    }
+
+    function updatePrivateKey() {
+        if (!node) {
+            alert("Please set the node first");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/hedging/updatePrivateKey",
+            data: $('#updatePrivateKey').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success: function (result) {
+                // alert("Initialization is complete and you are now ready to open the quote")
+                location.reload();
+            },
+            error: function () {
+                alert("Please enter the correct private key!!")
+            }
+        })
+    }
+
+    function startHedging() {
+        if (!node) {
+            alert("Please set the node first");
+            return false;
+        }
+
+        if (address == 'Please fill in the correct private key first') {
+            alert("Please fill in the correct private key first");
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/hedging/start-hedging",
+            data: $('').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success: function (result) {
+                location.reload();
+            },
+            error: function () {
+                alert("Error starting/closing!!")
+            }
+        })
+    }
+</script>
+
+<style type="text/css">
+    .bk {
+        background-color: cadetblue;
+        background-size: 100% 100%;
+    }
+</style>
+</html>
+

@@ -143,7 +143,7 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
         // Number of ETH to be traded at the exchange price
         BigDecimal actualEth   = deltaAccErc20.abs()
-                .divide(new BigDecimal(decimalsPowTen), 18, RoundingMode.HALF_UP)
+                .divide(new BigDecimal(decimalsPowTen), decimals.intValue(), RoundingMode.HALF_UP)
                 .divide(price, 18, BigDecimal.ROUND_HALF_UP)
                 .multiply(Constant.UNIT_ETH);
 
@@ -154,13 +154,14 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         log.info("actualDealEth={}",actualDealEth.toPlainString());
 
         Long orderId;
-        String dealEth = actualDealEth.divide(Constant.UNIT_ETH, 18, BigDecimal.ROUND_DOWN).toPlainString();
+        BigDecimal dealEth = actualDealEth.divide(Constant.UNIT_ETH, 18, BigDecimal.ROUND_DOWN);
+        BigDecimal dealErc20 = dealEth.multiply(price);
         if (BigDecimal.ZERO.compareTo(deltaAccEth) > 0) { // Buy the ETH sell ERC20
             log.info("Buy the ETH sell ERC20");
-            orderId = tradeMarketService.sendBuyMarketOrder(hedgingPoolService.getSymbol(), dealEth);
-        } else {    // Sell buy ERC20 ETH
-            log.info("Sell buy ERC20 ETH");
-            orderId = tradeMarketService.sendSellMarketOrder(hedgingPoolService.getSymbol(), dealEth);
+            orderId = tradeMarketService.sendBuyMarketOrder(hedgingPoolService.getSymbol(), dealErc20.toPlainString());
+        } else {    // Sell ETH  Buy  ERC20
+            log.info("Sell ETH  Buy  ERC20 ");
+            orderId = tradeMarketService.sendSellMarketOrder(hedgingPoolService.getSymbol(), dealEth.toPlainString());
         }
 
         // Sleep for two seconds and wait for the trade to complete

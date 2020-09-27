@@ -37,14 +37,26 @@ public class HedgingUsdtPoolServiceImpl implements HedgingPoolService {
         this.erc20Threshold = BigDecimal.ONE.multiply(Constant.UNIT_USDT);
     }
 
+    /**
+     * ETH/USDT Individual total share = trading pool share + lock-up share
+     *
+     * @return
+     */
     @Override
     public BigInteger getBalance() {
 
         BigInteger balanceOfUSDT = hedgingService.balanceOfUSDT();
         BigInteger balanceOfLockUSDT = hedgingService.balanceOfLockUSDT();
-        log.info("balanceOfUSDT=="+balanceOfUSDT);
-        log.info("balanceOfLockUSDT=="+balanceOfLockUSDT);
+
+        if (balanceOfLockUSDT == null || balanceOfUSDT == null) {
+            return null;
+        }
+        log.info("Trading pool share=" + balanceOfUSDT);
+        log.info("Lock up share=" + balanceOfLockUSDT);
+
         BigInteger balance = balanceOfLockUSDT.add(balanceOfUSDT);
+        log.info("Total individual share=" + balance);
+
         return balance;
     }
 

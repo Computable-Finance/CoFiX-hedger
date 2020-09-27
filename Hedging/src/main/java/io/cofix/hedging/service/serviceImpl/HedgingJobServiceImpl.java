@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Calendar;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 @Component
@@ -24,9 +25,6 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
 
     public static boolean START = false;
-
-    @Autowired
-    private HedgingService hedgingService;
 
 //    @Qualifier("mock")
     @Autowired
@@ -54,6 +52,7 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
     @Override
     public void hedgingPool(HedgingPoolService hedgingPoolService, TradeMarketService tradeMarketService) {
+        // Huobi exchange price
         BigDecimal price = hedgingPoolService.getExchangePrice();
 
         if (null == price) {
@@ -61,42 +60,44 @@ public class HedgingJobServiceImpl implements HedgingJobService {
             return;
         }
 
-        // 自己份额
+        // Total individual share
         BigInteger balance = hedgingPoolService.getBalance();
-        // 总份额
+        // Always share
         BigInteger totalSupply = hedgingPoolService.getTotalSupply();
-        // eth总份额
+        // The eth total number
         BigInteger eth = hedgingPoolService.getEth();
-        // erc20总份额
+        // The total number erc20
         BigInteger erc20 = hedgingPoolService.getErc20();
-        // erc20位数
+        // Erc20 digits
         BigInteger decimals = hedgingPoolService.getDecimals();
 
         PoolAmountVo newPoolAmountVo = new PoolAmountVo(balance, totalSupply, eth, erc20, decimals);
 
+        log.info("PoolAmountVo：{}", newPoolAmountVo);
+
         if (balance == null || totalSupply == null
                 || eth == null || erc20 == null
                 || decimals == null) {
-            log.info("未能查询到数据：{}", newPoolAmountVo);
             return;
         }
 
-        // 转换为10的n次方
+
+        // It's 10 to the n
         BigInteger decimalsPowTen = BigInteger.TEN.pow(decimals.intValue());
 
-        // 之前的交易池状态
+        // Previous trading pool status
         PoolAmountVo oldPoolAmountVo = hedgingPoolService.getOldPoolAmountVo();
 
         hedgingPoolService.setOldPoolAmountVo(newPoolAmountVo);
 
         log.info(hedgingPoolService.getSymbol() + " " + newPoolAmountVo);
 
-        // 第一次轮询
+        // The first poll
         if (null == oldPoolAmountVo) {
             return;
         }
 
-        // 如果没有变化，无需任何处理。
+        // If there is no change, no processing is required.
         if (newPoolAmountVo.equals(oldPoolAmountVo)) return;
 
         BigDecimal myNewEth = newPoolAmountVo.getMyEth();
@@ -110,12 +111,12 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         hedgingPoolService.addDeltaEth(deltaEth);
         hedgingPoolService.addDeltaErc20(deltaErc20);
 
-        // 如果周期内资产全部为正或者全部为负，均不需要处理
+        // If the assets in the period are all positive or all negative, no treatment is required
         if (isAllNegative(deltaEth, deltaErc20) || isAllPositive(deltaEth, deltaErc20)) {
             return;
         }
 
-        // 如果都没有达到阈值，无需处理
+        // If none of the thresholds are reached, no processing is required
         if ((deltaEth.abs().compareTo(hedgingPoolService.getEthThreshold()) < 0) &&
                 (deltaErc20.abs().compareTo(hedgingPoolService.getErc20Threshold()) < 0)) {
             return;
@@ -124,15 +125,15 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         BigDecimal deltaAccEth = hedgingPoolService.getDeltaEth();
         BigDecimal deltaAccErc20 = hedgingPoolService.getDeltaErc20();
 
-        // 现在可以开始对冲了
+        // Now you can start hedging
 /*
         if (BigDecimal.ZERO.compareTo(deltaAccEth) > 0)  hedgingService.buyEth(); else hedgingService.sellEth();
         if (BigDecimal.ZERO.compareTo(deltaAccErc20) > 0)  hedgingService.buyErc20(); else hedgingService.sellErc20();
 */
 
-        log.info("进入对冲. deltaAccEth["+deltaAccEth.toPlainString()+"] deltaAccErc20["+deltaAccErc20.toPlainString()+"]");
+        log.info("Enter the hedge. deltaAccEth["+deltaAccEth.toPlainString()+"] deltaAccErc20["+deltaAccErc20.toPlainString()+"]");
 
-        // 按交易所的价格折算后的ERC20
+        // The ERC20 at the exchange price
         BigDecimal actualErc20 = deltaAccEth.abs()
                 .divide(Constant.UNIT_ETH, 18, RoundingMode.HALF_UP)
                 .multiply(price)
@@ -140,7 +141,7 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
         log.info("actualErc20={}",actualErc20.toPlainString());
 
-        // 按交易所的价格需要交易的ETH数量
+        // Number of ETH to be traded at the exchange price
         BigDecimal actualEth   = deltaAccErc20.abs()
                 .divide(new BigDecimal(decimalsPowTen), 18, RoundingMode.HALF_UP)
                 .divide(price, 18, BigDecimal.ROUND_HALF_UP)
@@ -154,43 +155,50 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
         Long orderId;
         String dealEth = actualDealEth.divide(Constant.UNIT_ETH, 18, BigDecimal.ROUND_DOWN).toPlainString();
-        if (BigDecimal.ZERO.compareTo(deltaAccEth) > 0) { // 买ETH卖ERC20
-            log.info("买ETH卖ERC20");
+        if (BigDecimal.ZERO.compareTo(deltaAccEth) > 0) { // Buy the ETH sell ERC20
+            log.info("Buy the ETH sell ERC20");
             orderId = tradeMarketService.sendBuyMarketOrder(hedgingPoolService.getSymbol(), dealEth);
-        } else {    // 卖ETH买ERC20
-            log.info("卖ETH买ERC20");
+        } else {    // Sell buy ERC20 ETH
+            log.info("Sell buy ERC20 ETH");
             orderId = tradeMarketService.sendSellMarketOrder(hedgingPoolService.getSymbol(), dealEth);
         }
 
-        // 如果交易成功，将delta清掉，没有成功，累计到下一轮周期买卖
+        // Sleep for two seconds and wait for the trade to complete
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // If the trade is successful, the delta is cleared, and if it is not successful, it accumulates to the next cycle
         Order order = tradeMarketService.getOrderById(orderId);
-        // 完全成交
+
+        // Completely to clinch a deal
         if ("filled".equals(order.getState())) {
-            log.info("完全成交，将delta清掉");
+            log.info("It's a complete deal. Let's clear the delta");
             hedgingPoolService.addDeltaEth(deltaAccEth.negate());
             hedgingPoolService.addDeltaErc20(actualErc20.negate());
-        } else if ("partial-filled".equals(order.getState())) { // 部分成交
-            // 没有完全交易成功，可能卖掉了一部分，先撤单，然后delta减掉已经买了的数量
-            // 撤单 实际取消结果还是需要查询订单状态
-            log.info("进行撤单");
+        } else if ("partial-filled".equals(order.getState())) { // Some clinch a deal
+            // It didn't quite work out, maybe it sold some of it, withdrew the order, and then delta subtracted the amount that it had already bought
+            // The actual cancellation result still needs to query the order status
+            log.info("For cancellations");
             tradeMarketService.cancelOrder(orderId);
-            // 再次查询订单是否取消成功
+            // Check again whether the order was cancelled successfully
             Order order2 = tradeMarketService.getOrderById(orderId);
-            // 撤单完成后
+            // After the withdrawal is completed
             if ("canceled".equals(order2.getState())
                     || "partial-canceled".equals(order2.getState())
                     || "filled".equals(order2.getState())) {
 
-                log.info("撤单完成");
-                // 订单数量
+                // The order number
                 BigDecimal amount = order2.getAmount();
-                // 已成交数量
+                // Number of transactions
                 BigDecimal filledAmount = order2.getFilledAmount();
-                // 已卖的数量
+                // Quantity sold
                 if (filledAmount != null && amount != null) {
-                    // 已经交易的数量
+                    // The number of transactions that have been made
                     BigDecimal sellAmount = amount.subtract(filledAmount);
-                    // 防止接口返回0
+                    // Prevent the interface from returning 0
                     if (order2.getPrice() != null && order.getPrice().compareTo(BigDecimal.ZERO) > 0) {
                         price = order2.getPrice();
                     }
@@ -205,7 +213,7 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
                     sellAmount = sellAmount.multiply(Constant.UNIT_ETH);
                     selledErc20 = selledErc20.multiply(new BigDecimal(decimalsPowTen));
-                    log.info("完成交易的ETH数量={},ERC20数量={}", sellAmount.toPlainString(), selledErc20.toPlainString());
+                    log.info("Number of ETH transactions completed ={}, number of ERC20 ={}", sellAmount.toPlainString(), selledErc20.toPlainString());
                     hedgingPoolService.addDeltaEth(sellAmount);
                     hedgingPoolService.addDeltaErc20(selledErc20);
 
@@ -214,37 +222,17 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         }
     }
 
-/*
-    public void updateThreshold(BigDecimal ethThreshold, BigDecimal usdtThreshold, BigDecimal hbtcThreshold) {
-        this.ethThreshold = ethThreshold.multiply(Constant.UNIT_ETH);
-        this.usdtThreshold = usdtThreshold.multiply(Constant.UNIT_USDT);
-        this.hbtcThreshold = hbtcThreshold.multiply(Constant.UNIT_HBTC);
-    }
-
-    public BigDecimal getUsdtThreshold() {
-        return usdtThreshold;
-    }
-
-    public BigDecimal getEthThreshold() {
-        return ethThreshold;
-    }
-
-    public BigDecimal getHbtcThreshold() {
-        return hbtcThreshold;
-    }
-
-*/
 
     /**
-     * 轮询对冲
+     * Polling hedge
      */
     @Override
     public void hedging() {
         if (!START) {
-            log.info("未开启");
+            log.info("Did not open");
             return;
         }
-        log.info(Calendar.getInstance().getTime().toString() + " ==========轮询开始==========");
+        log.info(Calendar.getInstance().getTime().toString() + " ==========Polling began==========");
 
         hedgingPool(hedgingHbtcPoolService, tradeMarketService);
         hedgingPool(hedgingUsdtPoolService, tradeMarketService);

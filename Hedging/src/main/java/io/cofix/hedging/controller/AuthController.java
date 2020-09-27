@@ -29,7 +29,7 @@ public class AuthController {
 
     @RequestMapping(value = "/login")
     public ModelAndView login(ModelMap model) {
-//        return "login";
+
         return new ModelAndView("login", model);
     }
 
@@ -45,7 +45,6 @@ public class AuthController {
             session.setAttribute("user", user);
             session.setMaxInactiveInterval(3600);
 
-//            return "redirect:/hedging/hedgingData";
             return token;
         }
 

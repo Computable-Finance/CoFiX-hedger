@@ -7,21 +7,28 @@ import io.cofix.hedging.contract.LockFactoryContract;
 import io.cofix.hedging.model.ContractPairAddr;
 import io.cofix.hedging.service.HedgingService;
 import io.cofix.hedging.vo.PoolAmountVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Contract;
+import org.web3j.tx.ReadonlyTransactionManager;
+import org.web3j.tx.TransactionManager;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Service
+@Slf4j
 public class HedgingServiceImpl implements HedgingService {
 
     public Web3j web3j;
-    public Credentials credentials;
+    public  TransactionManager transactionManager = null;
+
+    public String address;
 
     public String node;
     private Integer interval;
@@ -35,7 +42,7 @@ public class HedgingServiceImpl implements HedgingService {
     private BigDecimal deltaErc20;
 
     HedgingServiceImpl() {
-        this.interval = 20;   // 默认10s
+        this.interval = 20;
         this.oldPoolAmountVo = null;
         this.deltaEth = BigDecimal.ZERO;
         this.deltaErc20 = BigDecimal.ZERO;
@@ -48,50 +55,48 @@ public class HedgingServiceImpl implements HedgingService {
      */
     @Override
     public String selectUserWalletAddress() {
-        return (null == credentials) ? null : credentials.getAddress();
+        return address;
     }
 
 
     private void updateContract() {
-        if (null == web3j || null == credentials) {
+        if (null == web3j) {
             return;
         }
 
-
-
-        // hbtc锁仓地址
+        // HBTC lock address
         //String hbtcLockAddress = getLockAddress(CofixContractAddress.HBTC_ADDR.getToken());
 
         HBTC_ERC20 = new ContractPairAddr<ERC20>(
-                ERC20.load(CofixContractAddress.HBTC_ADDR.getToken(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.HBTC_ADDR.getWeth(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.HBTC_ADDR.getLiqidity(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.HBTC_ADDR.getPair(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.HBTC_ADDR.getLock(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT)
+                ERC20.load(CofixContractAddress.HBTC_ADDR.getToken(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.HBTC_ADDR.getWeth(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.HBTC_ADDR.getLiqidity(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.HBTC_ADDR.getPair(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.HBTC_ADDR.getLock(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT)
         );
 
-        // hbtc锁仓地址
-       // String usdtLockAddress = getLockAddress(CofixContractAddress.USDT_ADDR.getToken());
+        // HBTC lock address
+        // String usdtLockAddress = getLockAddress(CofixContractAddress.USDT_ADDR.getToken());
 
         USDT_ERC20 = new ContractPairAddr<ERC20>(
-                ERC20.load(CofixContractAddress.USDT_ADDR.getToken(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.USDT_ADDR.getWeth(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.USDT_ADDR.getLiqidity(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.USDT_ADDR.getPair(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT),
-                ERC20.load(CofixContractAddress.USDT_ADDR.getLock(), web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT)
+                ERC20.load(CofixContractAddress.USDT_ADDR.getToken(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.USDT_ADDR.getWeth(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.USDT_ADDR.getLiqidity(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.USDT_ADDR.getPair(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT),
+                ERC20.load(CofixContractAddress.USDT_ADDR.getLock(), web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT)
         );
 
         return;
     }
 
-    private String getLockAddress(String tokenAddr){
-        ICoFiXFactory iCoFiXFactory = ICoFiXFactory.load(CofixContractAddress.ICFIX_FACTORY, web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT);
+    private String getLockAddress(String tokenAddr) {
+        ICoFiXFactory iCoFiXFactory = ICoFiXFactory.load(CofixContractAddress.ICFIX_FACTORY, web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT);
 
-        // 锁仓地址
+        // Lock the warehouse address
         String lockAddress = null;
         try {
             String pair = iCoFiXFactory.getPair(tokenAddr).send();
-            LockFactoryContract lockFactoryContract = LockFactoryContract.load(CofixContractAddress.LOCK_FACTORY_ADDRESS, web3j, credentials, Contract.GAS_PRICE, Contract.GAS_LIMIT);
+            LockFactoryContract lockFactoryContract = LockFactoryContract.load(CofixContractAddress.LOCK_FACTORY_ADDRESS, web3j, transactionManager, Contract.GAS_PRICE, Contract.GAS_LIMIT);
             lockAddress = lockFactoryContract.stakingPoolForPair(pair).send();
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +110,7 @@ public class HedgingServiceImpl implements HedgingService {
         web3j = Web3j.build(new HttpService(node));
         this.node = node;
 
-        if (null != credentials) {
+        if (null != transactionManager) {
             updateContract();
         }
     }
@@ -115,16 +120,20 @@ public class HedgingServiceImpl implements HedgingService {
         return this.node;
     }
 
-    /**
-     * Update the private key
-     */
     @Override
-    public void updateUserPrivateKey(String privateKey) {
-        credentials = Credentials.create(privateKey);
-
-        if (null != web3j) {
-            updateContract();
+    public void updateAddress(String address) {
+        if (StringUtils.isEmpty(address)) {
+            log.error("The address cannot be empty");
+            return;
         }
+        transactionManager = new ReadonlyTransactionManager(web3j, address);
+        updateContract();
+        this.address = address;
+    }
+
+    @Override
+    public String selectAddress() {
+        return this.address;
     }
 
     private BigInteger decimals(ERC20 erc20) {
@@ -138,14 +147,20 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/USDT交易池个人份额 查询
+     * ETH/USDT Trading pool individual share query
      *
      * @return
      */
     @Override
     public BigInteger balanceOfUSDT() {
+
+        if (StringUtils.isEmpty(address)) {
+            log.error("Please set the market maker's address first !");
+            return null;
+        }
+
         try {
-            return USDT_ERC20.getPair().balanceOf(credentials.getAddress()).send();
+            return USDT_ERC20.getPair().balanceOf(address).send();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -154,14 +169,19 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/USDT交易池锁仓个人份额 查询
+     * ETH/USDT Query of individual share in the lock of trading pool
      *
      * @return
      */
     @Override
     public BigInteger balanceOfLockUSDT() {
+        if (StringUtils.isEmpty(address)) {
+            log.error("Please set the market maker's address first !");
+            return null;
+        }
+
         try {
-            return USDT_ERC20.getLock().balanceOf(credentials.getAddress()).send();
+            return USDT_ERC20.getLock().balanceOf(address).send();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -175,7 +195,7 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/USDT交易池总份额查询
+     * ETH/USDT Total trading pool share query
      *
      * @return
      */
@@ -196,7 +216,7 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/USDT交易池ETH总份额查询
+     * ETH/USDT Total number of ETH trading pool
      *
      * @return
      */
@@ -217,7 +237,7 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/USDT交易池USDT总份额查询
+     * ETH/USDT Trading pool USDT total share query
      *
      * @return
      */
@@ -238,14 +258,20 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/HBTC 交易池token个人份额查询
+     * ETH/HBTC Trading pool individual share query
      *
      * @return
      */
     @Override
     public BigInteger balanceOfHBTC() {
+
+        if (StringUtils.isEmpty(address)) {
+            log.error("Please set the market maker's address first !");
+            return null;
+        }
+
         try {
-            return HBTC_ERC20.getPair().balanceOf(credentials.getAddress()).send();
+            return HBTC_ERC20.getPair().balanceOf(address).send();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -254,14 +280,20 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/HBTC 交易池锁仓个人份额查询
+     * ETH/HBTC Lock individual share query
      *
      * @return
      */
     @Override
     public BigInteger balanceOfLockHBTC() {
+
+        if (StringUtils.isEmpty(address)) {
+            log.error("Please set the market maker's address first !");
+            return null;
+        }
+
         try {
-            return HBTC_ERC20.getLock().balanceOf(credentials.getAddress()).send();
+            return HBTC_ERC20.getLock().balanceOf(address).send();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -275,7 +307,7 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/HBTC交易池总份额查询
+     * ETH/HBTC Total trading pool share query
      *
      * @return
      */
@@ -296,7 +328,7 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/HBTC交易池ETH总份额查询
+     * ETH/HBTC Trading pool ETH total share query
      *
      * @return
      */
@@ -317,7 +349,7 @@ public class HedgingServiceImpl implements HedgingService {
     }
 
     /**
-     * ETH/HBTC交易池 HBTC总份额查询
+     * ETH/HBTC Trading pool HBTC total share query
      *
      * @return
      */

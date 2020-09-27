@@ -21,23 +21,23 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object object) throws Exception {
-        // 从 http 请求头中取出 token
+        // Pull token from the HTTP request header
         String token = httpServletRequest.getHeader("token");
-        // 如果不是映射到方法直接通过
+        // If the method is not mapped directly through
         if(!(object instanceof HandlerMethod)){
             return true;
         }
         HandlerMethod handlerMethod=(HandlerMethod)object;
         Method method=handlerMethod.getMethod();
-        //检查有没有需要用户权限的注解
+        // Check if there are any annotations that require user permission
         if (method.isAnnotationPresent(TokenRequired.class)) {
             TokenRequired userLoginToken = method.getAnnotation(TokenRequired.class);
             if (userLoginToken.required()) {
-                // 执行认证
+                // Perform authentication
                 if (token == null) {
-                    throw new RuntimeException("无token，请重新登录");
+                    throw new RuntimeException("No token, please log in again");
                 }
-                // 获取 token 中的 user id
+                // Get the User ID in token
                 String userName;
                 try {
                     userName = JWT.decode(token).getClaim("username").asString();
@@ -46,12 +46,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 }
                 String password = userService.findPasswordByUserName(userName);
                 if (password == null) {
-                    throw new RuntimeException("用户不存在，请重新登录");
+                    throw new RuntimeException("The user does not exist, please log in again");
                 }
-                // 验证 token
+                // Authentication token
                 try {
                     if(!JwtUtil.verity(token,password)){
-                        throw new RuntimeException("无效的令牌");
+                        throw new RuntimeException("Invalid token");
                     }
                 } catch (JWTVerificationException e) {
                     throw new RuntimeException("401");

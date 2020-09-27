@@ -52,10 +52,10 @@
         </form>
 
 
-        <label>Set the private key (required): </label>
-        <form id="updatePrivateKey">
-            <input type="text" name="privateKey" id="privateKey" autocomplete="off">
-            <input type="button" onclick="updatePrivateKey()" value="submit"/>
+        <label>Set up a marketmaker account address (required): </label>
+        <form id="updateAddress">
+            <input type="text" name="address" id="address" autocomplete="off">
+            <input type="button" onclick="updateAddress()" value="submit"/>
         </form>
 
         <label>Set the hedging interval(default: 20s): </label>
@@ -260,24 +260,24 @@
         })
     }
 
-    function updatePrivateKey() {
+    function updateAddress() {
         if (!node) {
             alert("Please set the node first");
             return false;
         }
+
         $.ajax({
             type: "POST",
-            url: "/hedging/updatePrivateKey",
-            data: $('#updatePrivateKey').serialize(),
+            url: "/hedging/updateAddress",
+            data: $('#updateAddress').serialize(),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('token', localStorage.getItem('token'));
             },
             success: function (result) {
-                // alert("Initialization is complete and you are now ready to open the quote")
                 location.reload();
             },
             error: function () {
-                alert("Please enter the correct private key!!")
+                alert("Please enter the correct address!!")
             }
         })
     }

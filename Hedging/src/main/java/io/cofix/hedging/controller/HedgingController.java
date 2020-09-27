@@ -83,13 +83,13 @@ public class HedgingController {
 
 
     /**
-     * Set the account private key
+     * Set up a marketmaker account address
      */
     @TokenRequired
-    @PostMapping("/updatePrivateKey")
-    public String updateUserPrivatekey(@RequestParam(name = "privateKey") String privateKey) {
-        hedgingService.updateUserPrivateKey(privateKey);
-        return hedgingService.selectUserWalletAddress();
+    @PostMapping("/updateAddress")
+    public String updateAddress(@RequestParam(name = "address") String address) {
+        hedgingService.updateAddress(address);
+        return hedgingService.selectAddress();
     }
 
     /**
@@ -191,8 +191,8 @@ public class HedgingController {
 //    @TokenRequired
     @GetMapping("/hedgingData")
     public ModelAndView miningData() {
-        String address = hedgingService.selectUserWalletAddress();
-        if (address == null) address = "Please fill in the correct private key first";
+        String address = hedgingService.selectAddress();
+        if (address == null) address = "Please fill in the marketmaker account address";
 
         ModelAndView mav = new ModelAndView("hedgingData");
         mav.addObject("address", address);

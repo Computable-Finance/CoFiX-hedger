@@ -7,17 +7,17 @@ import lombok.Data;
 @AllArgsConstructor
 public class ContractPairAddr<T> {
     /**
-     * 代币合约地址。比如HBTC地址或者USDT地址
+     * Address of token contract. Such as HBTC address or USDT address
      */
     private T  token;
 
     /**
-     * WETH地址
+     * WETH address
      */
     private T  weth;
 
     /**
-     * 流通性凭证（份额）
+     * Negotiable certificate (share)
      */
     private T  liqidity;
 
@@ -27,7 +27,7 @@ public class ContractPairAddr<T> {
     private T  pair;
 
     /**
-     * 锁仓
+     * Lock up
      */
     private T lock;
 }

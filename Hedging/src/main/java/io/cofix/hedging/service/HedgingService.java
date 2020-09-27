@@ -11,12 +11,9 @@ import java.math.BigInteger;
  */
 public interface HedgingService {
 
-    /**
-     * Update the private key
-     *
-     * @param privateKey
-     */
-    void updateUserPrivateKey(String privateKey);
+    void updateAddress(String address);
+
+    String selectAddress();
 
     /**
      * Check your wallet address

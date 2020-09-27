@@ -37,13 +37,25 @@ public class HedgingHbtcPoolServiceImpl implements HedgingPoolService {
         this.erc20Threshold = BigDecimal.ONE.multiply(Constant.UNIT_HBTC);
     }
 
+    /**
+     * ETH/HBTC Individual total share = trading pool share + lock-up share
+     *
+     * @return
+     */
     @Override
     public BigInteger getBalance() {
+
         BigInteger balanceOfHBTC = hedgingService.balanceOfHBTC();
-        log.info("balanceOfHBTC=" + balanceOfHBTC);
         BigInteger balanceOfLockHBTC = hedgingService.balanceOfLockHBTC();
-        log.info("balanceOfLockHBTC=" + balanceOfLockHBTC);
+        log.info("Trading pool share=" + balanceOfHBTC);
+        log.info("Lock up share=" + balanceOfLockHBTC);
+
+        if (balanceOfHBTC == null || balanceOfLockHBTC == null) {
+            return null;
+        }
         BigInteger balance = balanceOfHBTC.add(balanceOfLockHBTC);
+        log.info("Total individual share=" + balance);
+
         return balance;
     }
 

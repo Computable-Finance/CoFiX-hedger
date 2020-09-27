@@ -15,7 +15,10 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 将我们上步定义的实现了HandlerInterceptor接口的拦截器实例authenticationInterceptor添加InterceptorRegistration中，并设置过滤规则，所有请求都要经过authenticationInterceptor拦截。
+        /**
+         *  Will we realized HandlerInterceptor interfaces defined shangbu interceptor instance authenticationInterceptor added InterceptorRegistration,
+         *  and set up the filtering rules, all request must pass authenticationInterceptor intercept.
+         */
         registry.addInterceptor(authenticationInterceptor())
                 .addPathPatterns("/**");
     }

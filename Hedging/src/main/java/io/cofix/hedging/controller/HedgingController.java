@@ -1,8 +1,10 @@
 package io.cofix.hedging.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import io.cofix.hedging.annotation.TokenRequired;
+import io.cofix.hedging.constant.CofixContractAddress;
 import io.cofix.hedging.constant.Constant;
 import io.cofix.hedging.service.HedgingJobService;
 import io.cofix.hedging.service.HedgingPoolService;
@@ -22,6 +24,7 @@ import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,11 +63,11 @@ public class HedgingController {
 
     @Qualifier("HBTC")
     @Autowired
-    private HedgingPoolService  hedgingHbtcPoolService;
+    private HedgingPoolService hedgingHbtcPoolService;
 
     @Qualifier("USDT")
     @Autowired
-    private HedgingPoolService  hedgingUsdtPoolService;
+    private HedgingPoolService hedgingUsdtPoolService;
 
     HedgingController(final HedgingService hedgingService, final TransactionServiceImpl eatOfferAndTransactionService, final Scheduler scheduler) {
         this.hedgingService = hedgingService;
@@ -154,22 +157,71 @@ public class HedgingController {
 
     @TokenRequired
     @PostMapping("/updateThreshold")
-    public String updateThreshold(@RequestParam(name = "ethThreshold") BigDecimal ethThreshold,
-                                  @RequestParam(name = "usdtThreshold") BigDecimal usdtThreshold,
-                                  @RequestParam(name = "hbtcThreshold") BigDecimal hbtcThreshold) {
+    public String updateThreshold(@RequestParam(name = "ethThreshold", required = false) BigDecimal ethThreshold,
+                                  @RequestParam(name = "usdtThreshold", required = false) BigDecimal usdtThreshold,
+                                  @RequestParam(name = "hbtcThreshold", required = false) BigDecimal hbtcThreshold) {
 
-        ethThreshold = ethThreshold.multiply(Constant.UNIT_ETH);
-        usdtThreshold = usdtThreshold.multiply(Constant.UNIT_USDT);
-        hbtcThreshold = hbtcThreshold.multiply(Constant.UNIT_HBTC);
+        if (ethThreshold != null) {
+            ethThreshold = ethThreshold.multiply(Constant.UNIT_ETH);
+            hedgingHbtcPoolService.setEthThreshold(ethThreshold);
+            hedgingUsdtPoolService.setEthThreshold(ethThreshold);
+        }
 
-        hedgingHbtcPoolService.setEthThreshold(ethThreshold);
-        hedgingHbtcPoolService.setErc20Threshold(hbtcThreshold);
+        if (usdtThreshold != null) {
+            usdtThreshold = usdtThreshold.multiply(Constant.UNIT_USDT);
+            hedgingUsdtPoolService.setErc20Threshold(usdtThreshold);
+        }
 
-        hedgingUsdtPoolService.setEthThreshold(ethThreshold);
-        hedgingUsdtPoolService.setErc20Threshold(usdtThreshold);
+        if (hbtcThreshold != null) {
+            hbtcThreshold = hbtcThreshold.multiply(Constant.UNIT_HBTC);
+            hedgingHbtcPoolService.setErc20Threshold(hbtcThreshold);
+
+        }
 
         return "ok";
     }
+
+    @TokenRequired
+    @PostMapping("/updateWethAddress")
+    public String updateWethAddress(@RequestParam(name = "weth") String weth) {
+        if (StringUtils.isEmpty(weth)){
+            throw new RuntimeException("The contract address cannot be empty");
+        }
+        CofixContractAddress.updateWethAddress(weth);
+
+        return "ok";
+    }
+
+    @TokenRequired
+    @PostMapping("/updateHbtcAddress")
+    public String updateHbtcAddress(@RequestParam(name = "token") String token,
+                                    @RequestParam(name = "pair") String pair,
+                                    @RequestParam(name = "lock") String lock) {
+        if (StringUtils.isEmpty(token)
+                ||StringUtils.isEmpty(pair)
+                ||StringUtils.isEmpty(lock)){
+            throw new RuntimeException("The contract address cannot be empty");
+        }
+        CofixContractAddress.updateHbtcAddress(token, pair, lock);
+
+        return "ok";
+    }
+
+    @TokenRequired
+    @PostMapping("/updateUsdtAddress")
+    public String updateUsdtAddress(@RequestParam(name = "token") String token,
+                                    @RequestParam(name = "pair") String pair,
+                                    @RequestParam(name = "lock") String lock) {
+        if (StringUtils.isEmpty(token)
+                ||StringUtils.isEmpty(pair)
+                ||StringUtils.isEmpty(lock)){
+            throw new RuntimeException("The contract address cannot be empty");
+        }
+        CofixContractAddress.updateUsdtAddress(token, pair, lock);
+
+        return "ok";
+    }
+
 
     /**
      * Set the network agent address and port
@@ -196,6 +248,16 @@ public class HedgingController {
 
         ModelAndView mav = new ModelAndView("hedgingData");
         mav.addObject("address", address);
+        mav.addObject("weth", CofixContractAddress.USDT_ADDR.getWeth());
+
+        mav.addObject("usdtToken", CofixContractAddress.USDT_ADDR.getToken());
+        mav.addObject("usdtPair", CofixContractAddress.USDT_ADDR.getPair());
+        mav.addObject("usdtLock", CofixContractAddress.USDT_ADDR.getLock());
+
+        mav.addObject("hbtcToken", CofixContractAddress.HBTC_ADDR.getToken());
+        mav.addObject("hbtcPair", CofixContractAddress.HBTC_ADDR.getPair());
+        mav.addObject("hbtcLock", CofixContractAddress.HBTC_ADDR.getLock());
+
         mav.addObject("node", hedgingService.getNode());
         mav.addObject("interval", hedgingService.getInterval());
         mav.addObject("proxyIp", HttpClientUtil.getProxyIp());

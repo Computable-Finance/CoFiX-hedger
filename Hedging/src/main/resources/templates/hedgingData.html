@@ -42,12 +42,55 @@
             <input type="text" name="node" id="node" autocomplete="off">
             <input type="button" onclick="updateNode()" value="submit"/>
         </form>
+        <p class="line"></p>
+            <form id="updateWethAddress">
+                <label>Enter  COFIX-WETH contract address (required):&nbsp;&nbsp;[[${weth}]]</label>
+                <p></p>
+                <input type="text" name="weth" id="weth" autocomplete="off">
+                <input type="button" onclick="updateWethAddress()" value="submit"/>
+            </form>
+        <p class="line"></p>
+            <form id="updateHbtcAddress">
+                <label>Enter COFIX-HBTC-TOKEN contract address (required):&nbsp;&nbsp;[[${hbtcToken}]]</label>
+                <p></p>
+                <input type="text" name="token" id="hbtcToken" autocomplete="off">
 
+                <p></p>
+                <label>Enter ETH/HBTC trading pool contract address (required):&nbsp;&nbsp;[[${hbtcPair}]]</label>
+                <p></p>
+                <input type="text" name="pair" id="hbtcPair" autocomplete="off">
+
+                <p></p>
+                <label>Enter ETH/HBTC lock contract address (required):&nbsp;&nbsp;[[${hbtcLock}]]</label>
+                <p></p>
+                <input type="text" name="lock" id="hbtcLock" autocomplete="off">
+                <p></p>
+                <input type="button" onclick="updateHbtcAddress()" value="submit"/>
+            </form>
+        <p class="line"></p>
+            <form id="updateUsdtAddress">
+                <label>Enter COFIX-USDT-TOKEN contract address (required):&nbsp;&nbsp;[[${usdtToken}]]</label>
+                <p></p>
+                <input type="text" name="token" id="usdtToken" autocomplete="off">
+
+                <p></p>
+                <label>Enter ETH/USDT trading pool contract address (required):&nbsp;&nbsp;[[${usdtPair}]]</label>
+                <p></p>
+                <input type="text" name="pair" id="usdtPair" autocomplete="off">
+
+                <p></p>
+                <label>Enter ETH/USDT lock contract address (required):&nbsp;&nbsp;[[${usdtLock}]]</label>
+                <p></p>
+                <input type="text" name="lock" id="usdtLock" autocomplete="off">
+                <p></p>
+                <input type="button" onclick="updateUsdtAddress()" value="submit"/>
+            </form>
+        <p class="line"></p>
 
         <label>Set the network agent address and port (not required): </label>
         <form id="updateProxy">
             <input type="text" name="proxyIp" id="proxyIp" autocomplete="off" placeholder="Proxy IP, default is 127.0.0.1">
-            <input type="text" name="proxyPort" id="proxyPort" autocomplete="off" placeholder="Proxy port, default is 1087">
+            <input type="text" name="proxyPort" id="proxyPort" autocomplete="off" placeholder="Proxy port, default is 0">
             <input type="button" onclick="updateProxy()" value="submit"/>
         </form>
 
@@ -67,11 +110,11 @@
 
         <p class="line"></p>
         <form id="updateExchangeApiKey">
-            <label>Enter huobi API-KEY</label>
+            <label>Enter huobi API-KEY (required)</label>
             <p></p>
             <input type="text" name="apiKey" autocomplete="off">
             <p></p>
-            <label>Enter huobi API-SECRET</label>
+            <label>Enter huobi API-SECRET (required)</label>
             <p></p>
             <input type="text" name="apiSecret" autocomplete="off">
             <p></p>
@@ -81,15 +124,15 @@
         <p class="line"></p>
 
         <form id="updateThreshold">
-            <label>Enter eth threshold</label>
+            <label>Enter eth threshold (The default is 1 eth)</label>
             <p></p>
             <input type="text" name="ethThreshold" id="ethThreshold" autocomplete="off">
             <p></p>
-            <label>Enter usdt threshold</label>
+            <label>Enter usdt threshold (The default is 1 usdt)</label>
             <p></p>
             <input type="text" name="usdtThreshold" id="usdtThreshold" autocomplete="off">
             <p></p>
-            <label>Enter hbtc threshold</label>
+            <label>Enter hbtc threshold (The default is 1 bhtc)</label>
             <p></p>
             <input type="text" name="hbtcThreshold" id="hbtcThreshold" autocomplete="off">
             <p></p>
@@ -116,24 +159,95 @@
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script type="text/javascript">
 
+    function updateUsdtAddress(){
+
+        var usdtToken = document.getElementById("usdtToken").value;
+        var usdtPair = document.getElementById("usdtPair").value;
+        var usdtLock = document.getElementById("usdtLock").value;
+        if (!usdtToken) {
+            alert("The UsdtToken address cannot be empty")
+            return false;
+        }
+        if (!usdtPair) {
+            alert("The UsdtPair address cannot be empty")
+            return false;
+        }
+
+        if (!usdtLock) {
+            alert("The UsdtLock address cannot be empty")
+            return false;
+        }
+
+        $.ajax({
+            type:"POST",
+            url:"/hedging/updateUsdtAddress",
+            data:$('#updateUsdtAddress').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success:function(result){
+                location.replace(location);
+            },
+            error:function(){
+                alert("Error !!")
+            }
+        })
+    }
+
+    function updateHbtcAddress(){
+
+        var hbtcToken = document.getElementById("hbtcToken").value;
+        var hbtcPair = document.getElementById("hbtcPair").value;
+        var hbtcLock = document.getElementById("hbtcLock").value;
+        if (!hbtcToken) {
+            alert("The HbtcToken address cannot be empty")
+            return false;
+        }
+        if (!hbtcPair) {
+            alert("The HbtcPair address cannot be empty")
+            return false;
+        }
+
+        if (!hbtcLock) {
+            alert("The HbtcLock address cannot be empty")
+            return false;
+        }
+
+        $.ajax({
+            type:"POST",
+            url:"/hedging/updateHbtcAddress",
+            data:$('#updateHbtcAddress').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success:function(result){
+                location.replace(location);
+            },
+            error:function(){
+                alert("Error !!")
+            }
+        })
+    }
+
+    function updateWethAddress(){
+        $.ajax({
+            type:"POST",
+            url:"/hedging/updateWethAddress",
+            data:$('#updateWethAddress').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success:function(result){
+                location.replace(location);
+            },
+            error:function(){
+                alert("Error !!")
+            }
+        })
+    }
+
+
     function updateThreshold(){
-        var ethThreshold = document.getElementById("ethThreshold").value;
-        var usdtThreshold = document.getElementById("usdtThreshold").value;
-        var hbtcThreshold = document.getElementById("hbtcThreshold").value;
-        if (!ethThreshold) {
-            alert("The EthThreshold cannot be empty")
-            return false;
-        }
-        if (!usdtThreshold) {
-            alert("The UsdtThreshold cannot be empty")
-            return false;
-        }
-
-        if (!hbtcThreshold) {
-            alert("The HbtcThreshold cannot be empty")
-            return false;
-        }
-
         $.ajax({
             type:"POST",
             url:"/hedging/updateThreshold",
@@ -288,8 +402,8 @@
             return false;
         }
 
-        if (address == 'Please fill in the correct private key first') {
-            alert("Please fill in the correct private key first");
+        if (address == 'Please fill in the marketmaker account address') {
+            alert("Please fill in the marketmaker account address");
             return false;
         }
 

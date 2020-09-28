@@ -4,7 +4,6 @@ import com.huobi.model.trade.Order;
 import io.cofix.hedging.constant.Constant;
 import io.cofix.hedging.service.HedgingJobService;
 import io.cofix.hedging.service.HedgingPoolService;
-import io.cofix.hedging.service.HedgingService;
 import io.cofix.hedging.service.TradeMarketService;
 import io.cofix.hedging.vo.PoolAmountVo;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Calendar;
-import java.util.TreeMap;
 import java.util.function.Function;
 
 @Component
@@ -165,7 +163,7 @@ public class HedgingJobServiceImpl implements HedgingJobService {
             log.info("Buy the ETH sell ERC20");
             orderId = tradeMarketService.sendBuyMarketOrder(hedgingPoolService.getSymbol(), dealErc20.toPlainString());
         } else {    // Sell ETH  Buy  ERC20
-            log.info("Sell ETH  Buy  ERC20 ");
+            log.info("Sell ETH  Buy  ERC20");
             orderId = tradeMarketService.sendSellMarketOrder(hedgingPoolService.getSymbol(), dealEth.toPlainString());
         }
 

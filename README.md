@@ -4,9 +4,13 @@
 
 ### CoFiX Hedge program
 
-#### 背景
+#### Background
 CoFiX作为一种可计算的金融交易模型的实现，需要做市商角色提供资金流动性，做市商通过承担一定的价格波动风险，来获取交易过程中得到的收益。CoFiX中定义的做市、赎回、兑换交易，都有可能会影响CoFiX资金池的资金比例，这是价格波动风险的来源。
 对于价格波动风险，做市商可以通过在场外进行反向交易对冲来消除，基本思路是根据资金池中资金的结构和自己的份额比例，实时的计算出自己可以分得的部分，与自己选定的参考点进行比较，消除负增量，从而保证在任何价格下，总资产都是处于增长状态。
+
+CoFiX is the implemetation of a computable financial transaction model. It requires the role of a market maker to provide liquidity, and the market maker takes a certain risk of price fluctuations, on the same time to earn a margin on each trade. The market making subscriptions, market making redemptions, and trading transactions in CoFiX may affect the proportion of funds in the asset pool, it is the source of price fluctuation risks.
+
+For the risk of price fluctuations, market makers can eliminate the risk through hedging. The basic idea is to calculate the asset they are entilted to in real time based on proportion of funds in the asset pool and their own share amount, and choose a reference point to eliminate negative increments, to ensure that the total assets are growing at any price.
 
 #### 说明
 根据前面的描述，具体的对冲策略可以有多种，本对冲程序按照前面描述的基本思路，实现了一种策略，来进行自动化对冲，具体逻辑如下：

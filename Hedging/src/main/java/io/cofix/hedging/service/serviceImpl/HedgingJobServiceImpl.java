@@ -106,13 +106,18 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         BigDecimal deltaEth = myNewEth.subtract(oldPoolAmountVo.getMyEth());
         BigDecimal deltaErc20 = myNewErc20.subtract(oldPoolAmountVo.getMyErc20());
 
-        log.info("Current delta [" + deltaEth.toPlainString() + ", " + deltaErc20.toPlainString() + "]");
-
         hedgingPoolService.addDeltaEth(deltaEth);
         hedgingPoolService.addDeltaErc20(deltaErc20);
 
         // If the assets in the period are all positive or all negative, no treatment is required
-        if (isAllNegative(deltaEth, deltaErc20) || isAllPositive(deltaEth, deltaErc20)) {
+        if (isAllNegative(deltaEth, deltaErc20)) {
+            log.info("Negative delta [" + deltaEth.toPlainString() + ", " + deltaErc20.toPlainString() + "]");
+            return;
+        }
+
+        log.info("Current delta [" + deltaEth.toPlainString() + ", " + deltaErc20.toPlainString() + "]");
+
+        if (isAllPositive(deltaEth, deltaErc20)) {
             return;
         }
 

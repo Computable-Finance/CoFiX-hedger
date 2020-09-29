@@ -76,7 +76,7 @@ public class HedgingHbtcPoolServiceImpl implements HedgingPoolService {
 
     @Override
     public BigInteger getDecimals() {
-        return hedgingService.balanceDecimalsOfEthOfHBTC();
+        return hedgingService.balanceDecimalsOfHbtcOfHBTC();
     }
 
     @Override

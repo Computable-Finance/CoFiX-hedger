@@ -77,7 +77,7 @@ public class HedgingUsdtPoolServiceImpl implements HedgingPoolService {
 
     @Override
     public BigInteger getDecimals() {
-        return hedgingService.balanceDecimalsOfEthOfUSDT();
+        return hedgingService.balanceDecimalsOfUsdtOfUSDT();
     }
 
     @Override

@@ -42,6 +42,9 @@ public class HedgingJobTests {
     @InjectMocks
     private HedgingJobService hedgingJob = new HedgingJobServiceImpl();
 
+    /**
+     * 池子中的交易币数量没有变化（1000000000000000000），不调用市场接口进行对冲
+     */
     @Test
     public void not_change_no_action() {
         BigDecimal ethThreshold = new BigDecimal("0.0001");
@@ -80,6 +83,11 @@ public class HedgingJobTests {
         verify(mockTradeMarketService, never()).sendSellMarketOrder(anyString(), anyString());
     }
 
+    /**
+     * 初始ETH为1eth，erc20为1，eth:erc20=1:3
+     * 变化为0.5eth, erc20为2.7.变化量为少了0.5eth,多了1.7erc20
+     * 此时应该在交易市场买入0.5eth,卖出1.5erc20
+     */
     @Test
     public void buy_eth_less_hbtc_from_market() {
         BigDecimal ethThreshold = new BigDecimal("0.0001");
@@ -117,10 +125,15 @@ public class HedgingJobTests {
         Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), anyString());
+        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.500000000000000000"));
         verify(mockTradeMarketService, never()).sendSellMarketOrder(anyString(), anyString());
     }
 
+    /**
+     * 初始ETH为1eth，erc20为1，eth:erc20=1:3
+     * 变化为0.5eth, erc20为2.5.变化量为少了0.5eth,多了1.5erc20
+     * 此时应该在交易市场买入0.5eth,卖出1.5erc20
+     */
     @Test
     public void buy_eth_equal_hbtc_from_market() {
         BigDecimal ethThreshold = new BigDecimal("0.0001");
@@ -158,7 +171,7 @@ public class HedgingJobTests {
         Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), anyString());
+        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.500000000000000000"));
         verify(mockTradeMarketService, never()).sendSellMarketOrder(anyString(), anyString());
     }
 }

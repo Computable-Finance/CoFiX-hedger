@@ -17,8 +17,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-//@SpringBootTest
-//@ComponentScan("io.cofix.hedging.*")
 public class HedgingJobTests {
     @Mock
     private HedgingPoolService mockHedgingPoolService;

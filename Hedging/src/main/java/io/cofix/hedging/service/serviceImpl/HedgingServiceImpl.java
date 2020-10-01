@@ -26,7 +26,7 @@ import java.math.BigInteger;
 public class HedgingServiceImpl implements HedgingService {
 
     public Web3j web3j;
-    public  TransactionManager transactionManager = null;
+    public TransactionManager transactionManager = null;
 
     public String address;
 
@@ -179,7 +179,9 @@ public class HedgingServiceImpl implements HedgingService {
             log.error("Please set the market maker's address first !");
             return null;
         }
-
+        if (USDT_ERC20.getLock()==null){
+            return BigInteger.ZERO;
+        }
         try {
             return USDT_ERC20.getLock().balanceOf(address).send();
         } catch (Exception e) {
@@ -290,6 +292,10 @@ public class HedgingServiceImpl implements HedgingService {
         if (StringUtils.isEmpty(address)) {
             log.error("Please set the market maker's address first !");
             return null;
+        }
+
+        if (HBTC_ERC20.getLock()==null){
+            return BigInteger.ZERO;
         }
 
         try {

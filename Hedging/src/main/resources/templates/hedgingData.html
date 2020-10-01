@@ -21,7 +21,9 @@
         <p></p>
         <label>Hedging interval: </label><label th:text=${interval}></label>
         <p></p>
-        <label>The ethThreshold: </label><label th:text=${ethThreshold}></label>
+        <label>The ethUsdtThreshold: </label><label th:text=${ethUsdtThreshold}></label>
+        <p></p>
+        <label>The ethHbtcThreshold: </label><label th:text=${ethHbtcThreshold}></label>
         <p></p>
         <label>The usdtThreshold: </label><label th:text=${usdtThreshold}></label>
         <p></p>
@@ -42,7 +44,7 @@
             <input type="text" name="node" id="node" autocomplete="off">
             <input type="button" onclick="updateNode()" value="submit"/>
         </form>
-        <p class="line"></p>
+      <!--  <p class="line"></p>
             <form id="updateWethAddress">
                 <label>Enter  COFIX-WETH contract address (required):&nbsp;&nbsp;[[${weth}]]</label>
                 <p></p>
@@ -85,7 +87,7 @@
                 <p></p>
                 <input type="button" onclick="updateUsdtAddress()" value="submit"/>
             </form>
-        <p class="line"></p>
+        <p class="line"></p>-->
 
         <label>Set the network agent address and port (not required): </label>
         <form id="updateProxy">
@@ -124,9 +126,13 @@
         <p class="line"></p>
 
         <form id="updateThreshold">
-            <label>Enter eth threshold (The default is 1 eth)</label>
+            <label>Enter eth/usdt threshold (The default is 1 eth)</label>
             <p></p>
-            <input type="text" name="ethThreshold" id="ethThreshold" autocomplete="off">
+            <input type="text" name="ethUsdtThreshold" id="ethUsdtThreshold" autocomplete="off">
+            <p></p>
+            <label>Enter eth/hbtc threshold (The default is 1 eth)</label>
+            <p></p>
+            <input type="text" name="ethHbtcThreshold" id="ethHbtcThreshold" autocomplete="off">
             <p></p>
             <label>Enter usdt threshold (The default is 1 usdt)</label>
             <p></p>

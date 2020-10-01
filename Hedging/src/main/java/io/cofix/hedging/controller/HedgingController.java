@@ -157,14 +157,19 @@ public class HedgingController {
 
     @TokenRequired
     @PostMapping("/updateThreshold")
-    public String updateThreshold(@RequestParam(name = "ethThreshold", required = false) BigDecimal ethThreshold,
+    public String updateThreshold(@RequestParam(name = "ethUsdtThreshold", required = false) BigDecimal ethUsdtThreshold,
+                                  @RequestParam(name = "ethHbtcThreshold", required = false) BigDecimal ethHbtcThreshold,
                                   @RequestParam(name = "usdtThreshold", required = false) BigDecimal usdtThreshold,
                                   @RequestParam(name = "hbtcThreshold", required = false) BigDecimal hbtcThreshold) {
 
-        if (ethThreshold != null) {
-            ethThreshold = ethThreshold.multiply(Constant.UNIT_ETH);
-            hedgingHbtcPoolService.setEthThreshold(ethThreshold);
-            hedgingUsdtPoolService.setEthThreshold(ethThreshold);
+        if (ethUsdtThreshold != null) {
+            ethUsdtThreshold = ethUsdtThreshold.multiply(Constant.UNIT_ETH);
+            hedgingUsdtPoolService.setEthThreshold(ethUsdtThreshold);
+        }
+
+        if (ethHbtcThreshold != null) {
+            ethHbtcThreshold = ethHbtcThreshold.multiply(Constant.UNIT_ETH);
+            hedgingHbtcPoolService.setEthThreshold(ethHbtcThreshold);
         }
 
         if (usdtThreshold != null) {
@@ -263,7 +268,8 @@ public class HedgingController {
         mav.addObject("proxyIp", HttpClientUtil.getProxyIp());
         mav.addObject("proxyPort", HttpClientUtil.getProxyPort());
         mav.addObject("start", HedgingJobServiceImpl.START ? "OPEN" : "CLOSE");
-        mav.addObject("ethThreshold", hedgingUsdtPoolService.getEthThreshold().divide(Constant.UNIT_ETH, 18, RoundingMode.HALF_UP).toPlainString());
+        mav.addObject("ethUsdtThreshold", hedgingUsdtPoolService.getEthThreshold().divide(Constant.UNIT_ETH, 18, RoundingMode.HALF_UP).toPlainString());
+        mav.addObject("ethHbtcThreshold", hedgingHbtcPoolService.getEthThreshold().divide(Constant.UNIT_ETH, 18, RoundingMode.HALF_UP).toPlainString());
         mav.addObject("usdtThreshold", hedgingUsdtPoolService.getErc20Threshold().divide(Constant.UNIT_USDT, 10, RoundingMode.HALF_UP).toPlainString());
         mav.addObject("hbtcThreshold", hedgingHbtcPoolService.getErc20Threshold().divide(Constant.UNIT_HBTC, 18, RoundingMode.HALF_UP).toPlainString());
 

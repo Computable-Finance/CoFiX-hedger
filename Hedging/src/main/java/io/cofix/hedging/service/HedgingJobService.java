@@ -1,11 +1,13 @@
 package io.cofix.hedging.service;
 
+import io.cofix.hedging.model.HedgingPool;
+
 import java.math.BigDecimal;
 
 public interface HedgingJobService {
     void hedging();
 
-    void hedgingPool(HedgingPoolService hedgingPoolService, TradeMarketService tradeMarketService);
+    void hedgingPool(HedgingPool hedgingPool, TradeMarketService tradeMarketService);
 
 /*
     void updateThreshold(BigDecimal ethThreshold, BigDecimal usdtThreshold, BigDecimal hbtcThreshold);

@@ -43,7 +43,7 @@ public class AuthController {
             user.put("userName", userName);
             user.put("passwd", passwd);
             session.setAttribute("user", user);
-            session.setMaxInactiveInterval(3600);
+            session.setMaxInactiveInterval(15 * 60);
 
             return token;
         }

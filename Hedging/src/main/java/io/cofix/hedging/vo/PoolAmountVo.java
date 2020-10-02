@@ -15,6 +15,7 @@ public class PoolAmountVo {
     private BigInteger erc20;
     private BigInteger decimals;
 
+
     @Override
     public String toString() {
         return "Balance[" + balance + "] total supply[" + totalSupply + "] ETH[" + eth

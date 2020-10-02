@@ -28,7 +28,7 @@ public interface TransactionService {
 
     Long sendBuyMarketOrder(String symbol, String amount);
 
-    BigDecimal getExchangePrice(String huobi_api);
+    BigDecimal getExchangePrice(String huobi_api, String symbols);
 
     String getApiKey();
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>CoFiX Automatic Hedging Program</title>
@@ -20,20 +20,39 @@
         <label>Wallet Address: </label><label th:text=${address}></label>
         <p></p>
         <label>Hedging interval: </label><label th:text=${interval}></label>
-        <p></p>
-        <label>The ethUsdtThreshold: </label><label th:text=${ethUsdtThreshold}></label>
-        <p></p>
-        <label>The ethHbtcThreshold: </label><label th:text=${ethHbtcThreshold}></label>
-        <p></p>
-        <label>The usdtThreshold: </label><label th:text=${usdtThreshold}></label>
-        <p></p>
-        <label>The hbtcThreshold: </label><label th:text=${hbtcThreshold}></label>
-        <p></p>
+        <ol>
+            <li th:each="m : ${hedgingPoolList}">
+                <p class="line"></p>
+                <form th:id="${m.huobiTradingPair}">
+                    <label>[[${m.huobiTradingPair}]]：</label>
+                    <input type="hidden" name="huobiTradingPair" th:value="${m.huobiTradingPair}">
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The eth threshold = <input type="text" name="unitEthThreshold" th:value="${m.unitEthThreshold()}" style="width: 200px;"> ;
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The [[${m.tokenName}]] threshold = <input type="text" name="unitErc20Threshold" th:value="${m.unitErc20Threshold()}" style="width: 200px;"> ;
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The Personal share = [[${m.poolAmountVo?.balance}]];
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The Total share = [[${m.poolAmountVo?.totalSupply}]];
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The Eth share = [[${m.poolAmountVo?.eth}]];
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The [[${m.tokenName}]] share = [[${m.poolAmountVo?.erc20}]];
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The Delta eth = [[${m.unitDeltaEth()}]];
+                    <p></p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;The Delta [[${m.tokenName}]] = [[${m.unitDeltaErc20()}]];
+                    <P></P>
+                    <input type="button" th:onclick="updateThreshold([[${m.huobiTradingPair}]])" value="UpdateThreshold" style="margin-left: 100px;"/>
+                </form>
+            </li>
+        </ol>
+        <p class="line"></p>
         <div th:if="${proxyPort>0}">
             <p></p>
-            <label>Proxy ip: </label><label th:text=${proxyIp}></label>
+            <label>Proxy ip: </label><label th:text="${proxyIp}"></label>
             <p></p>
-            <label>Proxy port: </label><label th:text=${proxyPort}></label>
+            <label>Proxy port: </label><label th:text="${proxyPort}"></label>
             <p></p>
         </div>
         <p></p>
@@ -42,71 +61,53 @@
         <label>Setting up ethereum nodes (required): </label>
         <form id="updateNode">
             <input type="text" name="node" id="node" autocomplete="off">
-            <input type="button" onclick="updateNode()" value="submit"/>
+            <input type="button" onclick="updateNode()" value="Submit"/>
         </form>
-      <!--  <p class="line"></p>
-            <form id="updateWethAddress">
-                <label>Enter  COFIX-WETH contract address (required):&nbsp;&nbsp;[[${weth}]]</label>
-                <p></p>
-                <input type="text" name="weth" id="weth" autocomplete="off">
-                <input type="button" onclick="updateWethAddress()" value="submit"/>
-            </form>
+
+        <label>Set up a marketmaker account address (required): </label>
+        <form id="updateAddress">
+            <input type="text" name="address" id="address" autocomplete="off">
+            <input type="button" onclick="updateAddress()" value="Submit"/>
+        </form>
+
         <p class="line"></p>
-            <form id="updateHbtcAddress">
-                <label>Enter COFIX-HBTC-TOKEN contract address (required):&nbsp;&nbsp;[[${hbtcToken}]]</label>
-                <p></p>
-                <input type="text" name="token" id="hbtcToken" autocomplete="off">
-
-                <p></p>
-                <label>Enter ETH/HBTC trading pool contract address (required):&nbsp;&nbsp;[[${hbtcPair}]]</label>
-                <p></p>
-                <input type="text" name="pair" id="hbtcPair" autocomplete="off">
-
-                <p></p>
-                <label>Enter ETH/HBTC lock contract address (required):&nbsp;&nbsp;[[${hbtcLock}]]</label>
-                <p></p>
-                <input type="text" name="lock" id="hbtcLock" autocomplete="off">
-                <p></p>
-                <input type="button" onclick="updateHbtcAddress()" value="submit"/>
-            </form>
-        <p class="line"></p>
-            <form id="updateUsdtAddress">
-                <label>Enter COFIX-USDT-TOKEN contract address (required):&nbsp;&nbsp;[[${usdtToken}]]</label>
-                <p></p>
-                <input type="text" name="token" id="usdtToken" autocomplete="off">
-
-                <p></p>
-                <label>Enter ETH/USDT trading pool contract address (required):&nbsp;&nbsp;[[${usdtPair}]]</label>
-                <p></p>
-                <input type="text" name="pair" id="usdtPair" autocomplete="off">
-
-                <p></p>
-                <label>Enter ETH/USDT lock contract address (required):&nbsp;&nbsp;[[${usdtLock}]]</label>
-                <p></p>
-                <input type="text" name="lock" id="usdtLock" autocomplete="off">
-                <p></p>
-                <input type="button" onclick="updateUsdtAddress()" value="submit"/>
-            </form>
-        <p class="line"></p>-->
 
         <label>Set the network agent address and port (not required): </label>
         <form id="updateProxy">
             <input type="text" name="proxyIp" id="proxyIp" autocomplete="off" placeholder="Proxy IP, default is 127.0.0.1">
             <input type="text" name="proxyPort" id="proxyPort" autocomplete="off" placeholder="Proxy port, default is 0">
-            <input type="button" onclick="updateProxy()" value="submit"/>
+            <input type="button" onclick="updateProxy()" value="Submit"/>
         </form>
 
+        <p class="line"></p>
+            <form id="addTransactionPool">
 
-        <label>Set up a marketmaker account address (required): </label>
-        <form id="updateAddress">
-            <input type="text" name="address" id="address" autocomplete="off">
-            <input type="button" onclick="updateAddress()" value="submit"/>
-        </form>
+                <label>Enter Huobi trading pairs (required):</label>
+                <p></p>
+                <input type="text" name="tradingPairs" id="tradingPairs" autocomplete="off">
+                <p></p>
+                <label>Enter erc20 token contract address (required):</label>
+                <p></p>
+                <input type="text" name="token" id="token" autocomplete="off">
+                <p></p>
+                <label>Enter eth threshold (not required,The default is 1 eth)</label>
+                <p></p>
+                <input type="text" name="ethThreshold" id="ethThreshold" autocomplete="off">
+                <p></p>
+                <label>Enter erc20 threshold (not required,The default is 1 erc20)</label>
+                <p></p>
+                <input type="text" name="erc20Threshold" id="erc20Threshold" autocomplete="off">
+                <p></p>
+                <p></p>
+                <input type="button" onclick="addTransactionPool()" value="Submit"/>
+            </form>
+        <p class="line"></p>-->
+
 
         <label>Set the hedging interval(default: 20s): </label>
         <form id="updateInterval">
             <input type="number" name="interval" id="interval" autocomplete="off">
-            <input type="button" onclick="updateInterval()" value="submit"/>
+            <input type="button" onclick="updateInterval()" value="Submit"/>
         </form>
 
 
@@ -120,37 +121,16 @@
             <p></p>
             <input type="text" name="apiSecret" autocomplete="off">
             <p></p>
-            <input type="button" onclick="updateExchangeApiKey()" value="submit"/>
+            <input type="button" onclick="updateExchangeApiKey()" value="Submit"/>
         </form>
 
         <p class="line"></p>
-
-        <form id="updateThreshold">
-            <label>Enter eth/usdt threshold (The default is 1 eth)</label>
-            <p></p>
-            <input type="text" name="ethUsdtThreshold" id="ethUsdtThreshold" autocomplete="off">
-            <p></p>
-            <label>Enter eth/hbtc threshold (The default is 1 eth)</label>
-            <p></p>
-            <input type="text" name="ethHbtcThreshold" id="ethHbtcThreshold" autocomplete="off">
-            <p></p>
-            <label>Enter usdt threshold (The default is 1 usdt)</label>
-            <p></p>
-            <input type="text" name="usdtThreshold" id="usdtThreshold" autocomplete="off">
-            <p></p>
-            <label>Enter hbtc threshold (The default is 1 bhtc)</label>
-            <p></p>
-            <input type="text" name="hbtcThreshold" id="hbtcThreshold" autocomplete="off">
-            <p></p>
-            <input type="button" onclick="updateThreshold()" value="submit"/>
-        </form>
-
 <!--
         <form id="updatePasswd">
             <label>Enter user password</label>
             <p></p>
             <input type="text" name="userPasswd" id="userPasswd" autocomplete="off">
-            <input type="button" onclick="updatePasswd()" value="submit"/>
+            <input type="button" onclick="updatePasswd()" value="Submit"/>
         </form>
 -->
     </div>
@@ -162,102 +142,17 @@
 </div>
 </body>
 
-<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script type="text/javascript">
 
-    function updateUsdtAddress(){
+    let node = '[[${node}]]';
+    let address = '[[${address}]]';
 
-        var usdtToken = document.getElementById("usdtToken").value;
-        var usdtPair = document.getElementById("usdtPair").value;
-        var usdtLock = document.getElementById("usdtLock").value;
-        if (!usdtToken) {
-            alert("The UsdtToken address cannot be empty")
-            return false;
-        }
-        if (!usdtPair) {
-            alert("The UsdtPair address cannot be empty")
-            return false;
-        }
-
-        if (!usdtLock) {
-            alert("The UsdtLock address cannot be empty")
-            return false;
-        }
-
-        $.ajax({
-            type:"POST",
-            url:"/hedging/updateUsdtAddress",
-            data:$('#updateUsdtAddress').serialize(),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('token', localStorage.getItem('token'));
-            },
-            success:function(result){
-                location.replace(location);
-            },
-            error:function(){
-                alert("Error !!")
-            }
-        })
-    }
-
-    function updateHbtcAddress(){
-
-        var hbtcToken = document.getElementById("hbtcToken").value;
-        var hbtcPair = document.getElementById("hbtcPair").value;
-        var hbtcLock = document.getElementById("hbtcLock").value;
-        if (!hbtcToken) {
-            alert("The HbtcToken address cannot be empty")
-            return false;
-        }
-        if (!hbtcPair) {
-            alert("The HbtcPair address cannot be empty")
-            return false;
-        }
-
-        if (!hbtcLock) {
-            alert("The HbtcLock address cannot be empty")
-            return false;
-        }
-
-        $.ajax({
-            type:"POST",
-            url:"/hedging/updateHbtcAddress",
-            data:$('#updateHbtcAddress').serialize(),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('token', localStorage.getItem('token'));
-            },
-            success:function(result){
-                location.replace(location);
-            },
-            error:function(){
-                alert("Error !!")
-            }
-        })
-    }
-
-    function updateWethAddress(){
-        $.ajax({
-            type:"POST",
-            url:"/hedging/updateWethAddress",
-            data:$('#updateWethAddress').serialize(),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('token', localStorage.getItem('token'));
-            },
-            success:function(result){
-                location.replace(location);
-            },
-            error:function(){
-                alert("Error !!")
-            }
-        })
-    }
-
-
-    function updateThreshold(){
+    function updateThreshold(id){
         $.ajax({
             type:"POST",
             url:"/hedging/updateThreshold",
-            data:$('#updateThreshold').serialize(),
+            data:$('#'+id).serialize(),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('token', localStorage.getItem('token'));
             },
@@ -269,6 +164,36 @@
             }
         })
     }
+
+
+    function addTransactionPool(){
+
+        if (!node) {
+            alert("Please set the node first");
+            return false;
+        }
+
+        if (address == 'Please fill in the marketmaker account address') {
+            alert("Please fill in the marketmaker account address");
+            return false;
+        }
+
+        $.ajax({
+            type:"POST",
+            url:"/hedging/addTransactionPool",
+            data:$('#addTransactionPool').serialize(),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('token', localStorage.getItem('token'));
+            },
+            success:function(result){
+                location.replace(location);
+            },
+            error:function(){
+                alert("Error !!")
+            }
+        })
+    }
+
 
     function updateProxy() {
         var proxyPort = document.getElementById("proxyPort").value;
@@ -356,8 +281,6 @@
         })
     }
 
-    var node = '[[${node}]]';
-    var address = '[[${address}]]';
 
     function updateInterval() {
         if (!node) {

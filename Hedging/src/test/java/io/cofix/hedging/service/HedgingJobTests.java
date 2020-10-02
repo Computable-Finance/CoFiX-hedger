@@ -1,6 +1,7 @@
 package io.cofix.hedging.service;
 
 import com.huobi.model.trade.Order;
+import io.cofix.hedging.model.HedgingPool;
 import io.cofix.hedging.service.serviceImpl.HedgingJobServiceImpl;
 import io.cofix.hedging.vo.PoolAmountVo;
 import org.junit.Test;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class HedgingJobTests {
     @Mock
-    private HedgingPoolService mockHedgingPoolService;
+    private HedgingPool mockHedgingPoolService;
 
     @Mock
     private TradeMarketService mockTradeMarketService;

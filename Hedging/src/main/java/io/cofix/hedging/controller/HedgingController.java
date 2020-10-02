@@ -1,15 +1,14 @@
 package io.cofix.hedging.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import io.cofix.hedging.annotation.TokenRequired;
-import io.cofix.hedging.constant.CofixContractAddress;
 import io.cofix.hedging.constant.Constant;
+import io.cofix.hedging.model.HedgingPool;
 import io.cofix.hedging.service.HedgingJobService;
-import io.cofix.hedging.service.HedgingPoolService;
 import io.cofix.hedging.service.HedgingService;
 
+import io.cofix.hedging.service.TransactionService;
 import io.cofix.hedging.service.serviceImpl.HedgingJobServiceImpl;
 import io.cofix.hedging.service.serviceImpl.TransactionServiceImpl;
 import io.cofix.hedging.utils.HttpClientUtil;
@@ -61,27 +60,13 @@ public class HedgingController {
     @Autowired
     HedgingJobService hedgingJob;
 
-    @Qualifier("HBTC")
     @Autowired
-    private HedgingPoolService hedgingHbtcPoolService;
-
-    @Qualifier("USDT")
-    @Autowired
-    private HedgingPoolService hedgingUsdtPoolService;
+    TransactionService transactionService;
 
     HedgingController(final HedgingService hedgingService, final TransactionServiceImpl eatOfferAndTransactionService, final Scheduler scheduler) {
         this.hedgingService = hedgingService;
         this.eatOfferAndTransactionService = eatOfferAndTransactionService;
         this.scheduler = scheduler;
-    }
-
-    /**
-     * Set scheduler interval in seconds.
-     */
-    @TokenRequired
-    @PostMapping("updateInterval")
-    public int updateInterval(@RequestParam Integer interval) {
-        return hedgingService.updateInterval(interval);
     }
 
 
@@ -157,72 +142,37 @@ public class HedgingController {
 
     @TokenRequired
     @PostMapping("/updateThreshold")
-    public String updateThreshold(@RequestParam(name = "ethUsdtThreshold", required = false) BigDecimal ethUsdtThreshold,
-                                  @RequestParam(name = "ethHbtcThreshold", required = false) BigDecimal ethHbtcThreshold,
-                                  @RequestParam(name = "usdtThreshold", required = false) BigDecimal usdtThreshold,
-                                  @RequestParam(name = "hbtcThreshold", required = false) BigDecimal hbtcThreshold) {
-
-        if (ethUsdtThreshold != null) {
-            ethUsdtThreshold = ethUsdtThreshold.multiply(Constant.UNIT_ETH);
-            hedgingUsdtPoolService.setEthThreshold(ethUsdtThreshold);
-        }
-
-        if (ethHbtcThreshold != null) {
-            ethHbtcThreshold = ethHbtcThreshold.multiply(Constant.UNIT_ETH);
-            hedgingHbtcPoolService.setEthThreshold(ethHbtcThreshold);
-        }
-
-        if (usdtThreshold != null) {
-            usdtThreshold = usdtThreshold.multiply(Constant.UNIT_USDT);
-            hedgingUsdtPoolService.setErc20Threshold(usdtThreshold);
-        }
-
-        if (hbtcThreshold != null) {
-            hbtcThreshold = hbtcThreshold.multiply(Constant.UNIT_HBTC);
-            hedgingHbtcPoolService.setErc20Threshold(hbtcThreshold);
-
-        }
+    public String updateThreshold(@RequestParam(name = "unitEthThreshold") BigDecimal unitEthThreshold,
+                                  @RequestParam(name = "unitErc20Threshold") BigDecimal unitErc20Threshold,
+                                  @RequestParam(name = "huobiTradingPair") String huobiTradingPair) {
+        hedgingService.updateInterval(unitEthThreshold,unitErc20Threshold,huobiTradingPair);
 
         return "ok";
     }
 
-    @TokenRequired
-    @PostMapping("/updateWethAddress")
-    public String updateWethAddress(@RequestParam(name = "weth") String weth) {
-        if (StringUtils.isEmpty(weth)){
-            throw new RuntimeException("The contract address cannot be empty");
-        }
-        CofixContractAddress.updateWethAddress(weth);
-
-        return "ok";
-    }
 
     @TokenRequired
-    @PostMapping("/updateHbtcAddress")
-    public String updateHbtcAddress(@RequestParam(name = "token") String token,
-                                    @RequestParam(name = "pair") String pair,
-                                    @RequestParam(name = "lock") String lock) {
-        if (StringUtils.isEmpty(token)
-                ||StringUtils.isEmpty(pair)
-                ||StringUtils.isEmpty(lock)){
-            throw new RuntimeException("The contract address cannot be empty");
+    @PostMapping("/addTransactionPool")
+    public String addTransactionPool(@RequestParam(name = "token") String token,
+                                     @RequestParam(name = "tradingPairs") String tradingPairs,
+                                     @RequestParam(name = "ethThreshold", required = false) BigDecimal ethThreshold,
+                                     @RequestParam(name = "erc20Threshold", required = false) BigDecimal erc20Threshold) {
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(tradingPairs)) {
+            throw new RuntimeException("The contract address or tradingPairs cannot be empty");
         }
-        CofixContractAddress.updateHbtcAddress(token, pair, lock);
 
-        return "ok";
-    }
+        // Check if the trade pairs are correct
+        String huobiUrl = Constant.HUOBI_API + tradingPairs;
 
-    @TokenRequired
-    @PostMapping("/updateUsdtAddress")
-    public String updateUsdtAddress(@RequestParam(name = "token") String token,
-                                    @RequestParam(name = "pair") String pair,
-                                    @RequestParam(name = "lock") String lock) {
-        if (StringUtils.isEmpty(token)
-                ||StringUtils.isEmpty(pair)
-                ||StringUtils.isEmpty(lock)){
-            throw new RuntimeException("The contract address cannot be empty");
+        try {
+            BigDecimal exchangePrice = transactionService.getExchangePrice(huobiUrl, tradingPairs);
+            log.info("***The added huobi trading pair [{}] gets a price of [{}]***", tradingPairs, exchangePrice);
+        } catch (Exception e) {
+            log.error("***Added huobi trading pair [{}], failed to get price: {}***", tradingPairs, e.getMessage());
+            return "error";
         }
-        CofixContractAddress.updateUsdtAddress(token, pair, lock);
+
+        hedgingService.createHegingPool(token, tradingPairs, ethThreshold, erc20Threshold);
 
         return "ok";
     }
@@ -253,48 +203,18 @@ public class HedgingController {
 
         ModelAndView mav = new ModelAndView("hedgingData");
         mav.addObject("address", address);
-        mav.addObject("weth", CofixContractAddress.USDT_ADDR.getWeth());
-
-        mav.addObject("usdtToken", CofixContractAddress.USDT_ADDR.getToken());
-        mav.addObject("usdtPair", CofixContractAddress.USDT_ADDR.getPair());
-        mav.addObject("usdtLock", CofixContractAddress.USDT_ADDR.getLock());
-
-        mav.addObject("hbtcToken", CofixContractAddress.HBTC_ADDR.getToken());
-        mav.addObject("hbtcPair", CofixContractAddress.HBTC_ADDR.getPair());
-        mav.addObject("hbtcLock", CofixContractAddress.HBTC_ADDR.getLock());
 
         mav.addObject("node", hedgingService.getNode());
         mav.addObject("interval", hedgingService.getInterval());
         mav.addObject("proxyIp", HttpClientUtil.getProxyIp());
         mav.addObject("proxyPort", HttpClientUtil.getProxyPort());
         mav.addObject("start", HedgingJobServiceImpl.START ? "OPEN" : "CLOSE");
-        mav.addObject("ethUsdtThreshold", hedgingUsdtPoolService.getEthThreshold().divide(Constant.UNIT_ETH, 18, RoundingMode.HALF_UP).toPlainString());
-        mav.addObject("ethHbtcThreshold", hedgingHbtcPoolService.getEthThreshold().divide(Constant.UNIT_ETH, 18, RoundingMode.HALF_UP).toPlainString());
-        mav.addObject("usdtThreshold", hedgingUsdtPoolService.getErc20Threshold().divide(Constant.UNIT_USDT, 10, RoundingMode.HALF_UP).toPlainString());
-        mav.addObject("hbtcThreshold", hedgingHbtcPoolService.getErc20Threshold().divide(Constant.UNIT_HBTC, 18, RoundingMode.HALF_UP).toPlainString());
-
+        // 展示各池数据
+        List<HedgingPool> hedgingPoolList = hedgingService.getHedgingPoolList();
+        mav.addObject("hedgingPoolList", hedgingPoolList);
         return mav;
     }
 
-    @GetMapping("/balance-of")
-    public BigInteger balanceOf() {
-        return hedgingService.balanceOfHBTC();
-    }
-
-    @GetMapping("/total-supply")
-    public BigInteger totalSupply() {
-        return hedgingService.totalSupplyOfHBTC();
-    }
-
-    @GetMapping("/eth-of-hbtc")
-    public BigInteger ethOfHBTC() {
-        return hedgingService.balanceOfEthOfHBTC();
-    }
-
-    @GetMapping("/hbtc-of-hbtc")
-    public BigInteger hbtcOfHBTC() {
-        return hedgingService.balanceOfHbtcOfHBTC();
-    }
 
     @TokenRequired
     @PostMapping("/start-hedging")

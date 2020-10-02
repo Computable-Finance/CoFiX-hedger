@@ -2,19 +2,21 @@ package io.cofix.hedging.service.serviceImpl;
 
 import com.huobi.model.trade.Order;
 import io.cofix.hedging.constant.Constant;
+import io.cofix.hedging.model.HedgingPool;
 import io.cofix.hedging.service.HedgingJobService;
-import io.cofix.hedging.service.HedgingPoolService;
+import io.cofix.hedging.service.HedgingService;
 import io.cofix.hedging.service.TradeMarketService;
 import io.cofix.hedging.vo.PoolAmountVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Calendar;
+import java.util.List;
 import java.util.function.Function;
 
 @Component
@@ -24,17 +26,13 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
     public static boolean START = false;
 
-//    @Qualifier("mock")
+    //    @Qualifier("mock")
     @Autowired
     private TradeMarketService tradeMarketService;
 
-    @Qualifier("HBTC")
     @Autowired
-    private HedgingPoolService hedgingHbtcPoolService;
+    HedgingService hedgingService;
 
-    @Qualifier("USDT")
-    @Autowired
-    private HedgingPoolService hedgingUsdtPoolService;
 
     private boolean isAll(BigDecimal decimalOne, BigDecimal decimalTwo, Function<BigDecimal, Boolean> compare) {
         return compare.apply(decimalOne) && compare.apply(decimalTwo);
@@ -49,25 +47,25 @@ public class HedgingJobServiceImpl implements HedgingJobService {
     }
 
     @Override
-    public void hedgingPool(HedgingPoolService hedgingPoolService, TradeMarketService tradeMarketService) {
+    public void hedgingPool(HedgingPool hedgingPool, TradeMarketService tradeMarketService) {
         // Huobi exchange price
-        BigDecimal price = hedgingPoolService.getExchangePrice();
+        BigDecimal price = hedgingPool.getExchangePrice();
 
         if (null == price) {
-            log.info("Get price from market failed." + hedgingPoolService.getSymbol());
+            log.info("Get price from market failed." + hedgingPool.getSymbol());
             return;
         }
 
         // Total individual share
-        BigInteger balance = hedgingPoolService.getBalance();
+        BigInteger balance = hedgingPool.getBalance();
         // Always share
-        BigInteger totalSupply = hedgingPoolService.getTotalSupply();
+        BigInteger totalSupply = hedgingPool.getTotalSupply();
         // The eth total number
-        BigInteger eth = hedgingPoolService.getEth();
+        BigInteger eth = hedgingPool.getEth();
         // The total number erc20
-        BigInteger erc20 = hedgingPoolService.getErc20();
+        BigInteger erc20 = hedgingPool.getErc20();
         // Erc20 digits
-        BigInteger decimals = hedgingPoolService.getDecimals();
+        BigInteger decimals = hedgingPool.getDecimals();
 
         PoolAmountVo newPoolAmountVo = new PoolAmountVo(balance, totalSupply, eth, erc20, decimals);
 
@@ -84,11 +82,11 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         BigInteger decimalsPowTen = BigInteger.TEN.pow(decimals.intValue());
 
         // Previous trading pool status
-        PoolAmountVo oldPoolAmountVo = hedgingPoolService.getOldPoolAmountVo();
+        PoolAmountVo oldPoolAmountVo = hedgingPool.getOldPoolAmountVo();
 
-        hedgingPoolService.setOldPoolAmountVo(newPoolAmountVo);
+        hedgingPool.setOldPoolAmountVo(newPoolAmountVo);
 
-        log.info(hedgingPoolService.getSymbol() + " " + newPoolAmountVo);
+        log.info(hedgingPool.getSymbol() + " " + newPoolAmountVo);
 
         // The first poll
         if (null == oldPoolAmountVo) {
@@ -104,8 +102,8 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         BigDecimal deltaEth = myNewEth.subtract(oldPoolAmountVo.getMyEth());
         BigDecimal deltaErc20 = myNewErc20.subtract(oldPoolAmountVo.getMyErc20());
 
-        hedgingPoolService.addDeltaEth(deltaEth);
-        hedgingPoolService.addDeltaErc20(deltaErc20);
+        hedgingPool.addDeltaEth(deltaEth);
+        hedgingPool.addDeltaErc20(deltaErc20);
 
         // If the assets in the period are all positive or all negative, no treatment is required
         if (isAllNegative(deltaEth, deltaErc20)) {
@@ -120,13 +118,13 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         }
 
         // If none of the thresholds are reached, no processing is required
-        if ((deltaEth.abs().compareTo(hedgingPoolService.getEthThreshold()) < 0) &&
-                (deltaErc20.abs().compareTo(hedgingPoolService.getErc20Threshold()) < 0)) {
+        if ((deltaEth.abs().compareTo(hedgingPool.getEthThreshold()) < 0) &&
+                (deltaErc20.abs().compareTo(hedgingPool.getErc20Threshold()) < 0)) {
             return;
         }
 
-        BigDecimal deltaAccEth = hedgingPoolService.getDeltaEth();
-        BigDecimal deltaAccErc20 = hedgingPoolService.getDeltaErc20();
+        BigDecimal deltaAccEth = hedgingPool.getDeltaEth();
+        BigDecimal deltaAccErc20 = hedgingPool.getDeltaErc20();
 
         // Now you can start hedging
 /*
@@ -134,7 +132,7 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         if (BigDecimal.ZERO.compareTo(deltaAccErc20) > 0)  hedgingService.buyErc20(); else hedgingService.sellErc20();
 */
 
-        log.info("Enter the hedge. deltaAccEth["+deltaAccEth.toPlainString()+"] deltaAccErc20["+deltaAccErc20.toPlainString()+"]");
+        log.info("Enter the hedge. deltaAccEth[" + deltaAccEth.toPlainString() + "] deltaAccErc20[" + deltaAccErc20.toPlainString() + "]");
 
         // The ERC20 at the exchange price
         BigDecimal actualErc20 = deltaAccEth.abs()
@@ -142,29 +140,29 @@ public class HedgingJobServiceImpl implements HedgingJobService {
                 .multiply(price)
                 .multiply(new BigDecimal(decimalsPowTen));
 
-        log.info("actualErc20={}",actualErc20.toPlainString());
+        log.info("actualErc20={}", actualErc20.toPlainString());
 
         // Number of ETH to be traded at the exchange price
-        BigDecimal actualEth   = deltaAccErc20.abs()
+        BigDecimal actualEth = deltaAccErc20.abs()
                 .divide(new BigDecimal(decimalsPowTen), decimals.intValue(), RoundingMode.HALF_UP)
                 .divide(price, 18, BigDecimal.ROUND_HALF_UP)
                 .multiply(Constant.UNIT_ETH);
 
-        log.info("actualEth={}",actualEth.toPlainString());
+        log.info("actualEth={}", actualEth.toPlainString());
 
         BigDecimal actualDealEth = (deltaAccErc20.abs().compareTo(actualErc20) > 0) ? deltaAccEth.abs() : actualEth;
 
-        log.info("actualDealEth={}",actualDealEth.toPlainString());
+        log.info("actualDealEth={}", actualDealEth.toPlainString());
 
         Long orderId;
         BigDecimal dealEth = actualDealEth.divide(Constant.UNIT_ETH, 18, BigDecimal.ROUND_DOWN);
         BigDecimal dealErc20 = dealEth.multiply(price);
         if (BigDecimal.ZERO.compareTo(deltaAccEth) > 0) { // Buy the ETH sell ERC20
             log.info("Buy the ETH sell ERC20");
-            orderId = tradeMarketService.sendBuyMarketOrder(hedgingPoolService.getSymbol(), dealErc20.toPlainString());
+            orderId = tradeMarketService.sendBuyMarketOrder(hedgingPool.getSymbol(), dealErc20.toPlainString());
         } else {    // Sell ETH  Buy  ERC20
             log.info("Sell ETH  Buy  ERC20");
-            orderId = tradeMarketService.sendSellMarketOrder(hedgingPoolService.getSymbol(), dealEth.toPlainString());
+            orderId = tradeMarketService.sendSellMarketOrder(hedgingPool.getSymbol(), dealEth.toPlainString());
         }
 
         // Sleep for two seconds and wait for the trade to complete
@@ -180,8 +178,8 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         // Completely to clinch a deal
         if ("filled".equals(order.getState())) {
             log.info("It's a complete deal. Let's clear the delta");
-            hedgingPoolService.addDeltaEth(deltaAccEth.negate());
-            hedgingPoolService.addDeltaErc20(actualErc20.negate());
+            hedgingPool.addDeltaEth(deltaAccEth.negate());
+            hedgingPool.addDeltaErc20(actualErc20.negate());
         } else if ("partial-filled".equals(order.getState())) { // Some clinch a deal
             // It didn't quite work out, maybe it sold some of it, withdrew the order, and then delta subtracted the amount that it had already bought
             // The actual cancellation result still needs to query the order status
@@ -218,8 +216,8 @@ public class HedgingJobServiceImpl implements HedgingJobService {
                     sellAmount = sellAmount.multiply(Constant.UNIT_ETH);
                     selledErc20 = selledErc20.multiply(new BigDecimal(decimalsPowTen));
                     log.info("Number of ETH transactions completed ={}, number of ERC20 ={}", sellAmount.toPlainString(), selledErc20.toPlainString());
-                    hedgingPoolService.addDeltaEth(sellAmount);
-                    hedgingPoolService.addDeltaErc20(selledErc20);
+                    hedgingPool.addDeltaEth(sellAmount);
+                    hedgingPool.addDeltaErc20(selledErc20);
 
                 }
             }
@@ -238,7 +236,13 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         }
         log.info(Calendar.getInstance().getTime().toString() + " ==========Polling began==========");
 
-        hedgingPool(hedgingHbtcPoolService, tradeMarketService);
-        hedgingPool(hedgingUsdtPoolService, tradeMarketService);
+        List<HedgingPool> hedgingPoolList = hedgingService.getHedgingPoolList();
+        if (CollectionUtils.isEmpty(hedgingPoolList)) {
+            log.info("The trading pool is empty. Please add a trading pool");
+        }
+
+        for (HedgingPool hedgingPool : hedgingPoolList) {
+            hedgingPool(hedgingPool, tradeMarketService);
+        }
     }
 }

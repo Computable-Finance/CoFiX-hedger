@@ -1,74 +1,29 @@
 package io.cofix.hedging.service;
 
+import io.cofix.hedging.contract.ERC20;
+import io.cofix.hedging.model.HedgingPool;
 import io.cofix.hedging.vo.PoolAmountVo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
-/**
- * ClassName:MiningService
- * Description:
- */
+
 public interface HedgingService {
+
+    List<HedgingPool> getHedgingPoolList();
 
     void updateAddress(String address);
 
     String selectAddress();
 
-    /**
-     * Check your wallet address
-     *
-     * @return
-     */
-    String selectUserWalletAddress();
+    void addHegingPool(HedgingPool hedgingPool);
 
+    BigInteger balanceOfPair(ERC20 pair);
 
-    BigInteger balanceOfUSDT();
-
-    BigInteger balanceOfLockUSDT();
-
-    BigInteger balanceDecimalsOfUSDT();
-
-    BigInteger totalSupplyOfUSDT();
-
-    BigInteger totalSupplyDecimalsOfUSDT();
-
-    BigInteger balanceOfEthOfUSDT();
-
-    BigInteger balanceDecimalsOfEthOfUSDT();
-
-    BigInteger balanceOfUsdtOfUSDT();
-
-    BigInteger balanceDecimalsOfUsdtOfUSDT();
-
-    /**
-     *
-     */
-    BigInteger balanceOfHBTC();
-
-    BigInteger balanceOfLockHBTC();
-
-    BigInteger balanceDecimalsOfHBTC();
-
-    BigInteger totalSupplyOfHBTC();
-
-    /**
-     * 初始化节点URL
-     * @param node
-     */
     void UpdateNode(String node);
 
     String getNode();
-
-    BigInteger totalSupplyDecimalsOfHBTC();
-
-    BigInteger balanceOfEthOfHBTC();
-
-    BigInteger balanceDecimalsOfEthOfHBTC();
-
-    BigInteger balanceOfHbtcOfHBTC();
-
-    BigInteger balanceDecimalsOfHbtcOfHBTC();
 
     /**
      * Update Interval in seconds.
@@ -95,59 +50,15 @@ public interface HedgingService {
      */
     String getJobKey();
 
-    /**
-     * Get OLD pool amount
-     * @return
-     */
-    PoolAmountVo getOldPoolAmountVo();
+    BigInteger balanceOfLock(ERC20 lock);
 
-    /**
-     * Set NEW pool amount
-     * @param newPoolAmountVo
-     */
-    void setOldPoolAmountVo(PoolAmountVo newPoolAmountVo);
+    BigInteger totalSupplyOfLiqidity(ERC20 liqidity);
 
-    /**
-     * Add Delta Eth
-     * @param deltaEth
-     */
-    void addDeltaEth(BigDecimal deltaEth);
+    BigInteger balanceOfEthOfWeth(ERC20 weth, String pairAddress);
 
-    /**
-     * Add Delta ERC20
-     * @param deltaErc20
-     */
-    void addDeltaErc20(BigDecimal deltaErc20);
+    BigInteger balanceOfErc20(ERC20 token, String pairAddress);
 
-    /**
-     * get Accumulate ETH
-     * @return
-     */
-    BigDecimal getDeltaEth();
+    void createHegingPool(String token, String tradingPairs, BigDecimal ethThreshold, BigDecimal erc20Threshold);
 
-    /**
-     * Get Accumulate ERC20
-     * @return
-     */
-    BigDecimal getDeltaErc20();
-
-    /**
-     * Buy ETH from houbi
-     */
-    void buyEth();
-
-    /**
-     * Sell ETH from houbi
-     */
-    void sellEth();
-
-    /**
-     * Buy ERC20 from houbi.
-     */
-    void buyErc20();
-
-    /**
-     * Sell ERC20 from houbi.
-     */
-    void sellErc20();
+    void updateInterval(BigDecimal unitEthThreshold, BigDecimal unitErc20Threshold, String huobiTradingPair);
 }

@@ -7,7 +7,10 @@ import io.cofix.hedging.utils.HttpClientUtil;
 import io.cofix.hedging.utils.api.ApiClient;
 import io.cofix.hedging.utils.api.JsonUtil;
 import io.cofix.hedging.utils.request.CreateOrderRequest;
-import io.cofix.hedging.utils.response.*;
+import io.cofix.hedging.utils.response.Accounts;
+import io.cofix.hedging.utils.response.AccountsResponse;
+import io.cofix.hedging.utils.response.BalanceResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -17,7 +20,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 
 @Service
@@ -32,8 +36,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     private volatile String API_KEY = "";
     private volatile String API_SECRET = "";
-
-    public static volatile String SYMBOLS;
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
@@ -68,7 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
      * Get the exchange price
      */
     @Override
-    public BigDecimal getExchangePrice(String huobi_api) {
+    public BigDecimal getExchangePrice(String huobi_api, String symbols) {
         if (huobi_api == null) {
             LOG.error("The Huobi API failed to initialize, and ERC20's Symbol failed to obtain");
             return null;
@@ -117,7 +119,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (n.compareTo(new BigDecimal("0")) > 0) {
             totalPrice = totalPrice.divide(n, 18, BigDecimal.ROUND_DOWN);
             // Depending on the transaction pair, it needs to be processed differently, or converted to ethXXX if it ends in the ETH
-            if (null != SYMBOLS && SYMBOLS.endsWith("eth")) {
+            if (StringUtils.isNotBlank(symbols) && symbols.endsWith("eth")) {
                 totalPrice = BigDecimal.ONE.divide(totalPrice, 18, BigDecimal.ROUND_DOWN);
             }
             return totalPrice;

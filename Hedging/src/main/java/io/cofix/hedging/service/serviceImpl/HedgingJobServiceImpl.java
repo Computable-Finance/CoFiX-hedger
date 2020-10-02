@@ -107,7 +107,7 @@ public class HedgingJobServiceImpl implements HedgingJobService {
 
         // If the assets in the period are all positive or all negative, no treatment is required
         if (isAllNegative(deltaEth, deltaErc20)) {
-            log.info("Negative delta [" + deltaEth.toPlainString() + ", " + deltaErc20.toPlainString() + "]");
+            log.warn("Negative delta [" + deltaEth.toPlainString() + ", " + deltaErc20.toPlainString() + "]");
             return;
         }
 

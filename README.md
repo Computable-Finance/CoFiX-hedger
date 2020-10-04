@@ -34,10 +34,28 @@ CoFiX作为一种可计算的金融交易模型的实现，需要做市商角色
 1. 必须优先设置节点地址（必填）。
 2. 设置做市商账户地址（必填）。
 3. 设置网络代理ip地址和端口（非必填）。
-4. 设置火币API-KEY和API-SECRET（必填）,交易所对冲必须填写API-KEY和API-SECRET。 
-5. 设置资产对冲轮询时间间隔（非必填，默认10秒）;
-6. 设置对冲阈值，根据需要自行设置。
-7. 开启对冲，以上配置完成后，点击 Hedging 可开启对冲，如需关闭，再点击一次即可。
+4. 设置添加交易池（必填）,可以依次添加多个。
+   * 交易池ERC20代币地址（必填）；
+   * 火币交易对（必填，如ethusdt）；
+   * WETH对冲阈值（非必填，默认1ETH）；
+   * ERC20对冲阈值（非必填，默认1ERC20）；
+5. 设置火币API-KEY和API-SECRET（必填）,交易所对冲必须填写API-KEY和API-SECRET。 
+6. 设置资产对冲轮询时间间隔（非必填，默认10秒）;
+7. 设置对冲阈值，根据需要自行设置。
+8. 开启对冲，以上配置完成后，点击 Hedging 可开启对冲，如需关闭，再点击一次即可。
+
+#### 相关合约地址配置说明
+	可以在application.properties 配置文件中进行配置，如果合约更新，地址变更，可以重新配置，然后重启程序。
+```properties
+## TEST WETH token contract address
+cofix.weth.contract.address=0x59b8881812ac484ab78b8fc7c10b2543e079a6c3
+
+## TEST Query the address of the trade pool contract based on the ERC20 token address
+cofix.icofix-factory.contract.address=0xB19EbE64A0ca9626824abBdbdeC4a76294D460A5
+
+## TEST Query the address of the lock pool contract based on the trade pool contract address
+cofix.lock-factory.contract.address=0xB6ae9774D2C743B0886123A1C98d4fc92558BaBC
+```
 
 
 #### 核心代码

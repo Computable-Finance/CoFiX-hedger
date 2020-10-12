@@ -9,6 +9,7 @@ import io.cofix.hedging.service.HedgingService;
 import io.cofix.hedging.service.TransactionService;
 import io.cofix.hedging.vo.PoolAmountVo;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ import org.web3j.tx.TransactionManager;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -51,6 +54,15 @@ public class HedgingServiceImpl implements HedgingService {
     String icofixfactory;
     @Value("${cofix.lock-factory.contract.address}")
     String lockFactory;
+
+    @Value("${huobi.proxy.enable}")
+    private Boolean huobiProxyEnable;
+
+    @Value("${huobi.proxy.server}")
+    private String huobiProxyServer;
+
+    @Value("${huobi.proxy.port}")
+    private Integer huobiProxyPort;
 
     @Autowired
     private HedgingService hedgingService;
@@ -111,7 +123,19 @@ public class HedgingServiceImpl implements HedgingService {
 
     @Override
     public void UpdateNode(String node) {
-        web3j = Web3j.build(new HttpService(node));
+        HttpService httpService;
+
+        if (huobiProxyEnable) {
+            Proxy proxy  = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(huobiProxyServer, huobiProxyPort));
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .proxy(proxy)
+                    .build();
+            httpService = new HttpService(node, client, false);
+        } else {
+            httpService = new HttpService(node);
+        }
+
+        web3j = Web3j.build(httpService);
         this.node = node;
     }
 
@@ -240,13 +264,26 @@ public class HedgingServiceImpl implements HedgingService {
      */
     @Override
     public void createHegingPool(String tokenAddres, String tradingPairs, BigDecimal ethThreshold, BigDecimal erc20Threshold) {
+        createHegingPoolBase(tokenAddres, tradingPairs, ethThreshold, erc20Threshold);
+    }
+
+    @Override
+    public void createHegingPool(String token, String tradingPairs, String apiKey, String apiSecret, BigDecimal ethThreshold, BigDecimal erc20Threshold) {
+        HedgingPool hedgingPool = createHegingPoolBase(token, tradingPairs, ethThreshold, erc20Threshold);
+        if (null == hedgingPool) return;
+
+        hedgingPool.setApiKey(apiKey);
+        hedgingPool.setSecretKey(apiSecret);
+    }
+
+    public HedgingPool createHegingPoolBase(String tokenAddres, String tradingPairs, BigDecimal ethThreshold, BigDecimal erc20Threshold) {
         if (null == web3j) {
             log.info("Please set the node first");
-            return;
+            return null;
         }
         if (null == transactionManager) {
             log.info("Please fill in the marketmaker account address");
-            return;
+            return null;
         }
         log.info("***The erc20 token contract adrees is {}***",tokenAddres);
 
@@ -288,7 +325,7 @@ public class HedgingServiceImpl implements HedgingService {
 
         if (decimals == null) {
             log.error("Decimals failed to get");
-            return;
+            return null;
         }
 
         BigDecimal decimalsPowTen = BigDecimal.TEN.pow(decimals.intValue());
@@ -300,6 +337,8 @@ public class HedgingServiceImpl implements HedgingService {
 
         HedgingPool hedgingPool = new HedgingPool(token, weth, pair, lock, tradingPairs, ethThreshold, erc20Threshold,hedgingService,transactionService);
         addHegingPool(hedgingPool);
+
+        return hedgingPool;
     }
 
     @Override

@@ -60,5 +60,8 @@ public interface HedgingService {
 
     void createHegingPool(String token, String tradingPairs, BigDecimal ethThreshold, BigDecimal erc20Threshold);
 
+    void createHegingPool(String token, String tradingPairs, String apiKey, String apiSecret, BigDecimal threshold, BigDecimal threshold1);
+
     void updateInterval(BigDecimal unitEthThreshold, BigDecimal unitErc20Threshold, String huobiTradingPair);
+
 }

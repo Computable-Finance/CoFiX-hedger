@@ -13,19 +13,21 @@ public class TradeMarketServiceHuobiImpl implements TradeMarketService {
     private TransactionService transactionService;
 
     @Override
-    public Long sendSellMarketOrder(String symbol, String amount) {
+    public long sendSellMarketOrder(String symbol, String amount) {
         return transactionService.sendSellMarketOrder(symbol, amount);
     }
 
     @Override
-    public Long sendBuyMarketOrder(String symbol, String amount) {
+    public long sendBuyMarketOrder(String symbol, String amount) {
         return transactionService.sendBuyMarketOrder(symbol, amount);
     }
 
     @Override
-    public Order getOrderById(Long orderId) {
+    public Order getOrderById(long orderId, String apiKey, String secretKey) {
+/*
         String apiKey = transactionService.getApiKey();
         String secretKey = transactionService.getSecretKey();
+*/
         Order order = null;
         try {
             order = HuobiUtil.getOrder(orderId, apiKey, secretKey);
@@ -36,7 +38,7 @@ public class TradeMarketServiceHuobiImpl implements TradeMarketService {
     }
 
     @Override
-    public long cancelOrder(Long orderId) {
+    public long cancelOrder(long orderId) {
         String apiKey = transactionService.getApiKey();
         String secretKey = transactionService.getSecretKey();
         long cancelResult = HuobiUtil.cancelOrder(orderId, apiKey, secretKey);

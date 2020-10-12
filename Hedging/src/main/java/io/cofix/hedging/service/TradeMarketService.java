@@ -4,11 +4,11 @@ import com.huobi.model.trade.Order;
 
 public interface TradeMarketService {
     // Market selling order (e.g. trade to HTUSDT, sell HT to get USDT)
-    Long sendSellMarketOrder(String symbol, String amount);
+    long sendSellMarketOrder(String symbol, String amount);
 
-    Long sendBuyMarketOrder(String symbol, String amount);
+    long sendBuyMarketOrder(String symbol, String amount);
 
-    Order getOrderById(Long orderId);
+    Order getOrderById(long orderId, String accessKey, String secretKey);
 
-    long cancelOrder(Long orderId);
+    long cancelOrder(long orderId);
 }

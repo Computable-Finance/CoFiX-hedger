@@ -6,6 +6,7 @@ import io.cofix.hedging.service.serviceImpl.HedgingJobServiceImpl;
 import io.cofix.hedging.vo.PoolAmountVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -13,7 +14,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -40,8 +43,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("100000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
 //        Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
 //        Mockito.when(mockHedgingPoolService.getErc20Threshold()).thenReturn(erc20Threshold);
@@ -53,8 +56,8 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("100000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getSymbol()).thenReturn("ethbtc");
 //        Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(BigDecimal.ONE);
@@ -62,8 +65,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("1000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("100000000000000000000"),
                         BigInteger.valueOf(18)));
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
@@ -85,8 +88,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("100000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
 //        Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
 //        Mockito.when(mockHedgingPoolService.getErc20Threshold()).thenReturn(erc20Threshold);
@@ -98,8 +101,8 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1500000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("150000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("150000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getSymbol()).thenReturn("ethbtc");
 //        Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(BigDecimal.ONE);
@@ -107,8 +110,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("1000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("100000000000000000000"),
                         BigInteger.valueOf(18)));
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
@@ -130,8 +133,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("100000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
 //        Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
 //        Mockito.when(mockHedgingPoolService.getErc20Threshold()).thenReturn(erc20Threshold);
@@ -143,8 +146,8 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("500000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("50000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("50000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getSymbol()).thenReturn("ethbtc");
 //        Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(BigDecimal.ONE);
@@ -152,8 +155,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("1000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("100000000000000000000"),
                         BigInteger.valueOf(18)));
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
@@ -173,8 +176,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("100000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
 //        Mockito.when(mockHedgingPoolService.getErc20Threshold()).thenReturn(erc20Threshold);
@@ -187,24 +190,39 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("2700000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("50000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("220000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getDeltaEth()).thenReturn(new BigDecimal("-500000000000000000"));
         Mockito.when(mockHedgingPoolService.getDeltaErc20()).thenReturn(new BigDecimal("1200000000000000000"));
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("1000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("100000000000000000000"),
                         BigInteger.valueOf(18)));
         Order   order   = new Order();
         order.setState("filled");
-        Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
+        Mockito.when(mockTradeMarketService.getOrderById(anyLong(), any(), any())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.200000000000000000"));
+        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.200"));
         verify(mockTradeMarketService, never()).sendSellMarketOrder(anyString(), anyString());
+
+        List<BigDecimal> capturedArgumentDeltaEth;
+        List<BigDecimal> capturedArgumentDeltaErc20;
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaEth = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaErc20 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(mockHedgingPoolService, times(1)).addDeltaEth(argumentCaptorDeltaEth.capture());
+        verify(mockHedgingPoolService, times(1)).addDeltaErc20(argumentCaptorDeltaErc20.capture());
+
+        capturedArgumentDeltaEth = argumentCaptorDeltaEth.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("-500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(1).stripTrailingZeros());
+
+        capturedArgumentDeltaErc20 = argumentCaptorDeltaErc20.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("1200000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("-1200000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(1).stripTrailingZeros());
     }
 
     /**
@@ -219,8 +237,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("100000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
 //        Mockito.when(mockHedgingPoolService.getErc20Threshold()).thenReturn(erc20Threshold);
@@ -233,24 +251,39 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("2700000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("50000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("270000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getDeltaEth()).thenReturn(new BigDecimal("-500000000000000000"));
         Mockito.when(mockHedgingPoolService.getDeltaErc20()).thenReturn(new BigDecimal("1700000000000000000"));
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("1000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("100000000000000000000"),
                         BigInteger.valueOf(18)));
         Order   order   = new Order();
         order.setState("filled");
-        Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
+        Mockito.when(mockTradeMarketService.getOrderById(anyLong(), any(), any())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.500000000000000000"));
+        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.500"));
         verify(mockTradeMarketService, never()).sendSellMarketOrder(anyString(), anyString());
+
+        List<BigDecimal> capturedArgumentDeltaEth;
+        List<BigDecimal> capturedArgumentDeltaErc20;
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaEth = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaErc20 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(mockHedgingPoolService, times(1)).addDeltaEth(argumentCaptorDeltaEth.capture());
+        verify(mockHedgingPoolService, times(1)).addDeltaErc20(argumentCaptorDeltaErc20.capture());
+
+        capturedArgumentDeltaEth = argumentCaptorDeltaEth.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("-500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(1).stripTrailingZeros());
+
+        capturedArgumentDeltaErc20 = argumentCaptorDeltaErc20.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("1700000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("-1700000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(1).stripTrailingZeros());
     }
 
     /**
@@ -265,8 +298,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("100000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
 //        Mockito.when(mockHedgingPoolService.getErc20Threshold()).thenReturn(erc20Threshold);
@@ -279,24 +312,39 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("2500000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("50000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("250000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getDeltaEth()).thenReturn(new BigDecimal("-500000000000000000"));
         Mockito.when(mockHedgingPoolService.getDeltaErc20()).thenReturn(new BigDecimal("1500000000000000000"));
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("1000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("100000000000000000000"),
                         BigInteger.valueOf(18)));
         Order   order   = new Order();
         order.setState("filled");
-        Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
+        Mockito.when(mockTradeMarketService.getOrderById(anyLong(), any(), any())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.500000000000000000"));
+        verify(mockTradeMarketService, times(1)).sendBuyMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("1.500"));
         verify(mockTradeMarketService, never()).sendSellMarketOrder(anyString(), anyString());
+
+        List<BigDecimal> capturedArgumentDeltaEth;
+        List<BigDecimal> capturedArgumentDeltaErc20;
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaEth = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaErc20 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(mockHedgingPoolService, times(1)).addDeltaEth(argumentCaptorDeltaEth.capture());
+        verify(mockHedgingPoolService, times(1)).addDeltaErc20(argumentCaptorDeltaErc20.capture());
+
+        capturedArgumentDeltaEth = argumentCaptorDeltaEth.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("-500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(1).stripTrailingZeros());
+
+        capturedArgumentDeltaErc20 = argumentCaptorDeltaErc20.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("1500000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("-1500000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(1).stripTrailingZeros());
     }
 
     /**
@@ -310,8 +358,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("3000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("300000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
         Mockito.when(mockHedgingPoolService.getSymbol()).thenReturn("ethbtc");
@@ -323,24 +371,39 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1500000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("150000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("150000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getDeltaEth()).thenReturn(new BigDecimal("500000000000000000"));
         Mockito.when(mockHedgingPoolService.getDeltaErc20()).thenReturn(new BigDecimal("-1500000000000000000"));
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                 BigInteger.valueOf(100),
-                new BigInteger("1000000000000000000"),
-                new BigInteger("3000000000000000000"),
+                new BigInteger("100000000000000000000"),
+                new BigInteger("300000000000000000000"),
                 BigInteger.valueOf(18)));
         Order   order   = new Order();
         order.setState("filled");
-        Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
+        Mockito.when(mockTradeMarketService.getOrderById(anyLong(), any(), any())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendSellMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("0.500000000000000000"));
+        verify(mockTradeMarketService, times(1)).sendSellMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("0.5000"));
         verify(mockTradeMarketService, never()).sendBuyMarketOrder(anyString(), anyString());
+
+        List<BigDecimal> capturedArgumentDeltaEth;
+        List<BigDecimal> capturedArgumentDeltaErc20;
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaEth = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaErc20 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(mockHedgingPoolService, times(1)).addDeltaEth(argumentCaptorDeltaEth.capture());
+        verify(mockHedgingPoolService, times(1)).addDeltaErc20(argumentCaptorDeltaErc20.capture());
+
+        capturedArgumentDeltaEth = argumentCaptorDeltaEth.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("-500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(1).stripTrailingZeros());
+
+        capturedArgumentDeltaErc20 = argumentCaptorDeltaErc20.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("-1500000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("1500000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(1).stripTrailingZeros());
     }
 
     /**
@@ -354,8 +417,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("3000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("300000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
         Mockito.when(mockHedgingPoolService.getSymbol()).thenReturn("ethbtc");
@@ -367,24 +430,39 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1800000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("150000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("180000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getDeltaEth()).thenReturn(new BigDecimal("500000000000000000"));
         Mockito.when(mockHedgingPoolService.getDeltaErc20()).thenReturn(new BigDecimal("-1200000000000000000"));
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("3000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("300000000000000000000"),
                         BigInteger.valueOf(18)));
         Order   order   = new Order();
         order.setState("filled");
-        Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
+        Mockito.when(mockTradeMarketService.getOrderById(anyLong(), any(), any())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendSellMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("0.400000000000000000"));
+        verify(mockTradeMarketService, times(1)).sendSellMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("0.4000"));
         verify(mockTradeMarketService, never()).sendBuyMarketOrder(anyString(), anyString());
+
+        List<BigDecimal> capturedArgumentDeltaEth;
+        List<BigDecimal> capturedArgumentDeltaErc20;
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaEth = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaErc20 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(mockHedgingPoolService, times(1)).addDeltaEth(argumentCaptorDeltaEth.capture());
+        verify(mockHedgingPoolService, times(1)).addDeltaErc20(argumentCaptorDeltaErc20.capture());
+
+        capturedArgumentDeltaEth = argumentCaptorDeltaEth.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("-500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(1).stripTrailingZeros());
+
+        capturedArgumentDeltaErc20 = argumentCaptorDeltaErc20.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("-1200000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("1200000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(1).stripTrailingZeros());
     }
 
     /**
@@ -398,8 +476,8 @@ public class HedgingJobTests {
         Mockito.when(mockHedgingPoolService.getExchangePrice()).thenReturn(BigDecimal.valueOf(3));
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1000000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("3000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("100000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("300000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getEthThreshold()).thenReturn(ethThreshold);
         Mockito.when(mockHedgingPoolService.getSymbol()).thenReturn("ethbtc");
@@ -411,24 +489,39 @@ public class HedgingJobTests {
 
         Mockito.when(mockHedgingPoolService.getBalance()).thenReturn(BigInteger.valueOf(1));
         Mockito.when(mockHedgingPoolService.getTotalSupply()).thenReturn(BigInteger.valueOf(100));
-        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("1500000000000000000"));
-        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("1300000000000000000"));
+        Mockito.when(mockHedgingPoolService.getEth()).thenReturn(new BigInteger("150000000000000000000"));
+        Mockito.when(mockHedgingPoolService.getErc20()).thenReturn(new BigInteger("130000000000000000000"));
         Mockito.when(mockHedgingPoolService.getDecimals()).thenReturn(BigInteger.valueOf(18));
         Mockito.when(mockHedgingPoolService.getDeltaEth()).thenReturn(new BigDecimal("500000000000000000"));
         Mockito.when(mockHedgingPoolService.getDeltaErc20()).thenReturn(new BigDecimal("-1700000000000000000"));
         Mockito.when(mockHedgingPoolService.getOldPoolAmountVo()).thenReturn(
                 new PoolAmountVo(BigInteger.valueOf(1),
                         BigInteger.valueOf(100),
-                        new BigInteger("1000000000000000000"),
-                        new BigInteger("3000000000000000000"),
+                        new BigInteger("100000000000000000000"),
+                        new BigInteger("300000000000000000000"),
                         BigInteger.valueOf(18)));
         Order   order   = new Order();
         order.setState("filled");
-        Mockito.when(mockTradeMarketService.getOrderById(anyLong())).thenReturn(order);
+        Mockito.when(mockTradeMarketService.getOrderById(anyLong(), any(), any())).thenReturn(order);
         hedgingJob.hedgingPool(mockHedgingPoolService, mockTradeMarketService);
 
-        verify(mockTradeMarketService, times(1)).sendSellMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("0.500000000000000000"));
+        verify(mockTradeMarketService, times(1)).sendSellMarketOrder(eq(mockHedgingPoolService.getSymbol()), eq("0.5000"));
         verify(mockTradeMarketService, never()).sendBuyMarketOrder(anyString(), anyString());
+
+        List<BigDecimal> capturedArgumentDeltaEth;
+        List<BigDecimal> capturedArgumentDeltaErc20;
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaEth = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> argumentCaptorDeltaErc20 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(mockHedgingPoolService, times(1)).addDeltaEth(argumentCaptorDeltaEth.capture());
+        verify(mockHedgingPoolService, times(1)).addDeltaErc20(argumentCaptorDeltaErc20.capture());
+
+        capturedArgumentDeltaEth = argumentCaptorDeltaEth.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("-500000000000000000").stripTrailingZeros(), capturedArgumentDeltaEth.get(1).stripTrailingZeros());
+
+        capturedArgumentDeltaErc20 = argumentCaptorDeltaErc20.<List<BigDecimal>> getAllValues();
+        assertEquals(new BigDecimal("-1700000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(0).stripTrailingZeros());
+//        assertEquals(new BigDecimal("1700000000000000000").stripTrailingZeros(), capturedArgumentDeltaErc20.get(1).stripTrailingZeros());
     }
 
 }

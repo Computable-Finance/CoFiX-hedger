@@ -50,7 +50,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 }
                 // Authentication token
                 try {
-                    if(!JwtUtil.verity(token,password)){
+                    if(!JwtUtil.verity(token, userName, password)){
                         throw new RuntimeException("Invalid token");
                     }
                 } catch (JWTVerificationException e) {

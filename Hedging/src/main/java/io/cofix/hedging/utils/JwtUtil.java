@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -16,20 +17,22 @@ public class JwtUtil {
     public static String sign(String username, String password) {
         //过期时间
         Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
-        //使用用户密码作为私钥进行加密
-        Algorithm algorithm = Algorithm.HMAC256(password);
+        //使用用户名和密码的MD5作为私钥进行加密
+        String key = getAlgorithmKey(username, password);
+        Algorithm algorithm = Algorithm.HMAC256(key);
         //设置头信息
         HashMap<String, Object> header = new HashMap<>(2);
         header.put("typ", "JWT");
         header.put("alg", "HS256");
-        //附带username和userID生成签名
+        //附带username生成签名
         return JWT.create().withHeader(header).withClaim("username", username).withExpiresAt(date).sign(algorithm);
     }
 
     //校验token
-    public static boolean verity(String token, String password) {
+    public static boolean verity(String token, String username, String password) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(password);
+            String key  = getAlgorithmKey(username, password);
+            Algorithm algorithm = Algorithm.HMAC256(key);
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(token);
             return true;
@@ -38,5 +41,13 @@ public class JwtUtil {
         } catch (JWTVerificationException e) {
             return false;
         }
+    }
+
+    private static String getAlgorithmKey(String username, String password) {
+        String  key = username + "-" + password;
+
+        key = DigestUtils.md5Hex(key);
+
+        return key;
     }
 }

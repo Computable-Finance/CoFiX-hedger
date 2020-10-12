@@ -15,6 +15,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
     /**
      * Cross domain
+     *
      * @param registry
      */
     @Override
@@ -27,10 +28,14 @@ public class MvcConfig implements WebMvcConfigurer {
 
     /**
      * Registered interceptor
+     *
      * @param registry
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(permissionInterceptor);
+        registry.addInterceptor(permissionInterceptor)
+                .excludePathPatterns("/check/**")
+                .excludePathPatterns("/auth/**")
+                .excludePathPatterns("/static/**");
     }
 }

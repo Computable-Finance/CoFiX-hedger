@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.function.Function;
 @Slf4j
 public class HedgingJobServiceImpl implements HedgingJobService {
 
-
+    public final static String ORDER_DONE = "filled";
     public static boolean START = false;
 
     //    @Qualifier("mock")
@@ -123,6 +124,16 @@ public class HedgingJobServiceImpl implements HedgingJobService {
             return;
         }
 
+        Order   orderOld = tradeMarketService.getOrderById(hedgingPool.getOrderId(), hedgingPool.getApiKey(), hedgingPool.getSecretKey());
+        if ((orderOld != null) && (!ORDER_DONE.equals(orderOld.getState()))) {
+            // Order is pending, no more action.
+            log.warn("Order not completed.");
+            return;
+        } else {
+            hedgingPool.clearPendingAccAmount();    // Order completed. continue hedging.
+        }
+
+        // This is new delta ACC.
         BigDecimal deltaAccEth = hedgingPool.getDeltaEth();
         BigDecimal deltaAccErc20 = hedgingPool.getDeltaErc20();
 
@@ -159,69 +170,26 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         BigDecimal dealErc20 = dealEth.multiply(price);
         if (BigDecimal.ZERO.compareTo(deltaAccEth) > 0) { // Buy the ETH sell ERC20
             log.info("Buy the ETH sell ERC20");
-            orderId = tradeMarketService.sendBuyMarketOrder(hedgingPool.getSymbol(), dealErc20.toPlainString());
+            orderId = tradeMarketService.sendBuyMarketOrder(hedgingPool.getSymbol(), dealErc20.round(new MathContext(4, RoundingMode.DOWN)).toPlainString());
         } else {    // Sell ETH  Buy  ERC20
             log.info("Sell ETH  Buy  ERC20");
-            orderId = tradeMarketService.sendSellMarketOrder(hedgingPool.getSymbol(), dealEth.toPlainString());
+            orderId = tradeMarketService.sendSellMarketOrder(hedgingPool.getSymbol(), dealEth.round(new MathContext(4, RoundingMode.DOWN)).toPlainString());
         }
 
-        // Sleep for two seconds and wait for the trade to complete
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        hedgingPool.setOrderId(orderId);
+        hedgingPool.setPendingAccAmount(deltaAccEth, deltaAccErc20);
 
+        // Order status will be check the next polling.
+/*
         // If the trade is successful, the delta is cleared, and if it is not successful, it accumulates to the next cycle
-        Order order = tradeMarketService.getOrderById(orderId);
+        Order order = tradeMarketService.getOrderById(orderId, hedgingPool.getApiKey(), hedgingPool.getSecretKey());
 
         // Completely to clinch a deal
-        if ("filled".equals(order.getState())) {
+        if (null != order && "filled".equals(order.getState())) {
             log.info("It's a complete deal. Let's clear the delta");
-            hedgingPool.addDeltaEth(deltaAccEth.negate());
-            hedgingPool.addDeltaErc20(actualErc20.negate());
-        } else if ("partial-filled".equals(order.getState())) { // Some clinch a deal
-            // It didn't quite work out, maybe it sold some of it, withdrew the order, and then delta subtracted the amount that it had already bought
-            // The actual cancellation result still needs to query the order status
-            log.info("For cancellations");
-            tradeMarketService.cancelOrder(orderId);
-            // Check again whether the order was cancelled successfully
-            Order order2 = tradeMarketService.getOrderById(orderId);
-            // After the withdrawal is completed
-            if ("canceled".equals(order2.getState())
-                    || "partial-canceled".equals(order2.getState())
-                    || "filled".equals(order2.getState())) {
-
-                // The order number
-                BigDecimal amount = order2.getAmount();
-                // Number of transactions
-                BigDecimal filledAmount = order2.getFilledAmount();
-                // Quantity sold
-                if (filledAmount != null && amount != null) {
-                    // The number of transactions that have been made
-                    BigDecimal sellAmount = amount.subtract(filledAmount);
-                    // Prevent the interface from returning 0
-                    if (order2.getPrice() != null && order.getPrice().compareTo(BigDecimal.ZERO) > 0) {
-                        price = order2.getPrice();
-                    }
-
-                    BigDecimal selledErc20 = sellAmount.multiply(price);
-
-                    if (BigDecimal.ZERO.compareTo(deltaAccEth) > 0) {
-                        selledErc20 = selledErc20.negate();
-                    } else {
-                        sellAmount = sellAmount.negate();
-                    }
-
-                    sellAmount = sellAmount.multiply(Constant.UNIT_ETH);
-                    selledErc20 = selledErc20.multiply(new BigDecimal(decimalsPowTen));
-                    log.info("Number of ETH transactions completed ={}, number of ERC20 ={}", sellAmount.toPlainString(), selledErc20.toPlainString());
-                    hedgingPool.addDeltaEth(sellAmount);
-                    hedgingPool.addDeltaErc20(selledErc20);
-
-                }
-            }
-        }
+            hedgingPool.clearPendingAccAmount();
+        }  // else we will waiting for complete.
+*/
     }
 
 

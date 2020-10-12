@@ -59,6 +59,12 @@ public class HedgingPool {
     private ERC20 lock;
 
     private BigInteger decimals;
+    private Long orderId;
+
+    private String HUOBI_API_KEY;
+    private String HUOBI_SECRET_KEY;
+    private BigDecimal pendingAccEth;
+    private BigDecimal pendingAccErc20;
 
     public HedgingPool() {
     }
@@ -135,6 +141,11 @@ public class HedgingPool {
         return balance;
     }
 
+    /**
+     * Lock individual share query
+     * @param address
+     * @return
+     */
     public BigInteger balanceOfLock(String address) {
 
         if (StringUtils.isEmpty(address)) {
@@ -155,6 +166,11 @@ public class HedgingPool {
         return null;
     }
 
+    /**
+     * Individual share query in trading pool
+     * @param address
+     * @return
+     */
     public BigInteger balanceOfPair(String address) {
 
         if (StringUtils.isEmpty(address)) {
@@ -172,6 +188,10 @@ public class HedgingPool {
     }
 
 
+    /**
+     * Total trading pool share query
+     * @return
+     */
     public BigInteger getTotalSupply() {
         try {
             return liqidity.totalSupply().send();
@@ -183,6 +203,10 @@ public class HedgingPool {
     }
 
 
+    /**
+     * Trading pool ETH share query
+     * @return
+     */
     public BigInteger getEth() {
         try {
             return weth.balanceOf(pair.getContractAddress()).send();
@@ -194,6 +218,10 @@ public class HedgingPool {
     }
 
 
+    /**
+     * Trading pool ERC20 share query
+     * @return
+     */
     public BigInteger getErc20() {
         try {
             return token.balanceOf(pair.getContractAddress()).send();
@@ -371,5 +399,61 @@ public class HedgingPool {
 
     public void setTokenName(String tokenName) {
         this.tokenName = tokenName;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
+    public Long getOrderId() {
+        return this.orderId;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.HUOBI_API_KEY  = apiKey;
+    }
+
+    public String getApiKey() {
+        return this.HUOBI_API_KEY;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.HUOBI_SECRET_KEY = secretKey;
+    }
+
+    public String getSecretKey() {
+        return this.HUOBI_SECRET_KEY;
+    }
+
+    public BigDecimal getPendingAccEth() {
+        return this.pendingAccEth;
+    }
+
+    public void setPendingAccEth(BigDecimal deltaAccEth) {
+        this.pendingAccEth = deltaAccEth;
+    }
+
+    public BigDecimal getPendingAccErc20() {
+        return this.pendingAccErc20;
+    }
+
+    public void setPendingAccErc20(BigDecimal deltaAccErc20) {
+        this.pendingAccErc20 = deltaAccErc20;
+    }
+
+    public void setPendingAccAmount(BigDecimal deltaAccEth, BigDecimal deltaAccErc20) {
+        log.info("Set pending [{}, {}]", deltaAccEth, deltaAccErc20);
+
+        setPendingAccEth(deltaAccEth);
+        setPendingAccErc20(deltaAccErc20);
+    }
+    public void clearPendingAccAmount() {
+        log.info("Clear pending [{}, {}]", this.pendingAccEth, this.pendingAccErc20);
+
+        this.addDeltaEth(this.pendingAccEth.negate());
+        this.addDeltaErc20(this.pendingAccErc20.negate());
+
+        this.pendingAccEth  = BigDecimal.ZERO;
+        this.pendingAccErc20    = BigDecimal.ZERO;
     }
 }

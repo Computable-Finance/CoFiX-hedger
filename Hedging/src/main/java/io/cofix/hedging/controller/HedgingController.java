@@ -19,6 +19,7 @@ import io.cofix.hedging.utils.response.AccountsResponse;
 import io.cofix.hedging.utils.response.BalanceResponse;
 import io.cofix.hedging.vo.HedgingQuartzJob;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,6 +36,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +54,7 @@ public class HedgingController {
 
     final private HedgingService hedgingService;
 
-    final private TransactionServiceImpl eatOfferAndTransactionService;
+    final private TransactionServiceImpl transactionServiceIml;
 
     final private Scheduler scheduler;
 
@@ -63,12 +66,17 @@ public class HedgingController {
     @Autowired
     TransactionService transactionService;
 
-    HedgingController(final HedgingService hedgingService, final TransactionServiceImpl eatOfferAndTransactionService, final Scheduler scheduler) {
+    HedgingController(final HedgingService hedgingService, final TransactionServiceImpl transactionServiceIml, final Scheduler scheduler) {
         this.hedgingService = hedgingService;
-        this.eatOfferAndTransactionService = eatOfferAndTransactionService;
+        this.transactionServiceIml = transactionServiceIml;
         this.scheduler = scheduler;
     }
 
+    @TokenRequired
+    @PostMapping("/updateInterval")
+    public void updateInterval(@RequestParam Integer interval) {
+        hedgingService.updateInterval(interval);
+    }
 
     /**
      * Set up a marketmaker account address
@@ -122,7 +130,7 @@ public class HedgingController {
                 }
             });
 
-            String result = eatOfferAndTransactionService.updateExchangeApiKey(apiKey, apiSecret);
+            String result = transactionServiceIml.updateExchangeApiKey(apiKey, apiSecret);
             if (result.equalsIgnoreCase("SUCCESS")) {
                 return balanceList;
             }
@@ -155,6 +163,8 @@ public class HedgingController {
     @PostMapping("/addTransactionPool")
     public String addTransactionPool(@RequestParam(name = "token") String token,
                                      @RequestParam(name = "tradingPairs") String tradingPairs,
+                                     @RequestParam(name = "apiKey") String apiKey,
+                                     @RequestParam(name = "apiSecret") String apiSecret,
                                      @RequestParam(name = "ethThreshold", required = false) BigDecimal ethThreshold,
                                      @RequestParam(name = "erc20Threshold", required = false) BigDecimal erc20Threshold) {
         if (StringUtils.isEmpty(token) || StringUtils.isEmpty(tradingPairs)) {
@@ -172,7 +182,7 @@ public class HedgingController {
             return "error";
         }
 
-        hedgingService.createHegingPool(token, tradingPairs, ethThreshold, erc20Threshold);
+        hedgingService.createHegingPool(token, tradingPairs, apiKey, apiSecret, ethThreshold, erc20Threshold);
 
         return "ok";
     }
@@ -188,6 +198,8 @@ public class HedgingController {
     @TokenRequired
     @PostMapping("/updateProxy")
     public String updateProxy(@RequestParam(name = "proxyIp") String proxyIp, @RequestParam(name = "proxyPort") int proxyPort) {
+//        ApiClient.setProxy(proxyIp, proxyPort);
+
         HttpClientUtil.updateProxy(proxyIp, proxyPort);
         return "ok";
     }

@@ -9,24 +9,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class TradeMarketServiceMockImpl implements TradeMarketService {
     @Override
-    public Long sendSellMarketOrder(String symbol, String amount) {
+    public long sendSellMarketOrder(String symbol, String amount) {
         log.info("Sell " + symbol + " : " + amount);
         return new Long(0);
     }
 
     @Override
-    public Long sendBuyMarketOrder(String symbol, String amount) {
+    public long sendBuyMarketOrder(String symbol, String amount) {
         log.info("Buy " + symbol + " : " + amount);
         return new Long(0);
     }
 
     @Override
-    public Order getOrderById(Long orderId) {
+    public Order getOrderById(long orderId, String apiKey, String secretKey) {
         return new Order();
     }
 
     @Override
-    public long cancelOrder(Long orderId) {
+    public long cancelOrder(long orderId) {
         return 0;
     }
 }

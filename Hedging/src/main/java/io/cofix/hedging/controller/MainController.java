@@ -3,7 +3,9 @@ package io.cofix.hedging.controller;
 import io.cofix.hedging.service.HedgingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 public class MainController {
@@ -11,7 +13,7 @@ public class MainController {
     HedgingService hedgingService;
 
     @GetMapping("/")
-    String root() {
-        return "redirect:/auth/verify";
+    public ModelAndView root() {
+        return new ModelAndView("redirect:/hedging/hedgingData");
     }
 }

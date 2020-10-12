@@ -66,7 +66,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.56</version>
+            <version>1.2.73</version>
         </dependency>
 
         <dependency>
@@ -169,10 +169,14 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>**/*.properties</include>
+                    <include>**/*.yml</include>
                     <!--Load template file -->
                     <include>**/*.html</include>
+                    <include>**/*.js</include>
                     <!--Load static file -->
                     <include>/static/</include>
+                    <!--Load xml file -->
+                    <include>**/*.xml</include>
                 </includes>
             </resource>
             <resource>

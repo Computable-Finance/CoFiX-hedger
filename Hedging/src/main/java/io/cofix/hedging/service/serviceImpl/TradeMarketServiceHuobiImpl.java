@@ -1,6 +1,7 @@
 package io.cofix.hedging.service.serviceImpl;
 
 import com.huobi.model.trade.Order;
+import io.cofix.hedging.service.HedgingService;
 import io.cofix.hedging.service.TransactionService;
 import io.cofix.hedging.service.TradeMarketService;
 import io.cofix.hedging.utils.HuobiUtil;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 public class TradeMarketServiceHuobiImpl implements TradeMarketService {
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private HedgingService hedgingService;
 
     @Override
     public long sendSellMarketOrder(String symbol, String amount) {

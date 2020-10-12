@@ -2,6 +2,8 @@ package io.cofix.hedging.service.serviceImpl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import io.cofix.hedging.model.HedgingPool;
+import io.cofix.hedging.service.HedgingService;
 import io.cofix.hedging.service.TransactionService;
 import io.cofix.hedging.utils.HttpClientUtil;
 import io.cofix.hedging.utils.api.ApiClient;
@@ -13,6 +15,7 @@ import io.cofix.hedging.utils.response.BalanceResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,9 @@ import java.util.List;
 @Service
 public class TransactionServiceImpl implements TransactionService {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionServiceImpl.class);
+
+    @Autowired
+    private HedgingService hedgingService;
 
     // ERC20 symbol
     public static volatile String SYMBOL = null;
@@ -141,7 +147,9 @@ public class TransactionServiceImpl implements TransactionService {
     // Market selling order (e.g. trade to HTUSDT, sell HT to get USDT)
     @Override
     public Long sendSellMarketOrder(String symbol, String amount) {
-        ApiClient client = new ApiClient(API_KEY, API_SECRET);
+        HedgingPool hedgingPool = getHedgingPoolBySymbol(symbol);
+
+        ApiClient client = new ApiClient(hedgingPool.getApiKey(), hedgingPool.getSecretKey());
         AccountsResponse accounts = client.accounts();
         Long orderId = -1L;
         List<Accounts> list = (List<Accounts>) accounts.getData();
@@ -173,7 +181,9 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public Long sendBuyMarketOrder(String symbol, String amount) {
-        ApiClient client = new ApiClient(API_KEY, API_SECRET);
+        HedgingPool hedgingPool = getHedgingPoolBySymbol(symbol);
+
+        ApiClient client = new ApiClient(hedgingPool.getApiKey(), hedgingPool.getSecretKey());
         AccountsResponse accounts = client.accounts();
         Long orderId = -1L;
         List<Accounts> list = (List<Accounts>) accounts.getData();
@@ -248,4 +258,15 @@ public class TransactionServiceImpl implements TransactionService {
         return null;
     }
 
+    private HedgingPool getHedgingPoolBySymbol(String symbol) {
+        if (org.springframework.util.StringUtils.isEmpty(symbol)) return null;
+
+        List<HedgingPool> hedgingPools = hedgingService.getHedgingPoolList();
+        for (HedgingPool hedgingPool : hedgingPools) {
+            if (symbol.equals(hedgingPool.getSymbol()))
+                return hedgingPool;
+        }
+
+        return null;
+    }
 }

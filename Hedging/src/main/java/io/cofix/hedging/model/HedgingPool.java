@@ -67,6 +67,11 @@ public class HedgingPool {
     private BigDecimal pendingAccErc20;
 
     public HedgingPool() {
+        this.deltaEth = BigDecimal.ZERO;
+        this.deltaErc20 = BigDecimal.ZERO;
+
+        this.pendingAccEth  = BigDecimal.ZERO;
+        this.pendingAccErc20 = BigDecimal.ZERO;
     }
 
     public BigDecimal unitDeltaEth() {
@@ -103,6 +108,9 @@ public class HedgingPool {
 
         this.deltaEth = BigDecimal.ZERO;
         this.deltaErc20 = BigDecimal.ZERO;
+
+        this.pendingAccEth  = BigDecimal.ZERO;
+        this.pendingAccErc20 = BigDecimal.ZERO;
 
         try {
             String name = token.name().send();

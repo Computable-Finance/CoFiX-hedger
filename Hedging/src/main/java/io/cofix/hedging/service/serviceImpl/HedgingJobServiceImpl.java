@@ -129,7 +129,9 @@ public class HedgingJobServiceImpl implements HedgingJobService {
             // Order is pending, no more action.
             log.warn("Order not completed.");
             return;
-        } else {
+        }
+
+        if ((orderOld != null) && (ORDER_DONE.equals(orderOld.getState()))) {
             hedgingPool.clearPendingAccAmount();    // Order completed. continue hedging.
         }
 

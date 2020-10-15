@@ -21,7 +21,7 @@ public interface HedgingService {
 
     BigInteger balanceOfPair(ERC20 pair);
 
-    void UpdateNode(String node);
+    void UpdateNode(String node, String nodeUsername, String nodePassword);
 
     String getNode();
 

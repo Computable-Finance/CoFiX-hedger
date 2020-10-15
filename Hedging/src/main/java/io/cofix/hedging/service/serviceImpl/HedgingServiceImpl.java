@@ -7,8 +7,8 @@ import io.cofix.hedging.contract.LockFactoryContract;
 import io.cofix.hedging.model.HedgingPool;
 import io.cofix.hedging.service.HedgingService;
 import io.cofix.hedging.service.TransactionService;
-import io.cofix.hedging.vo.PoolAmountVo;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,11 +64,15 @@ public class HedgingServiceImpl implements HedgingService {
     @Value("${huobi.proxy.port}")
     private Integer huobiProxyPort;
 
+    // 节点访问的用户名和密码
+    private String nodeUsername;
+    private String nodePassword;
+
     @Autowired
     private HedgingService hedgingService;
+
     @Autowired
     private TransactionService transactionService;
-
 
     HedgingServiceImpl() {
         this.interval = 20;
@@ -122,8 +126,11 @@ public class HedgingServiceImpl implements HedgingService {
 
 
     @Override
-    public void UpdateNode(String node) {
+    public void UpdateNode(String node, String nodeUsername, String nodePassword) {
         HttpService httpService;
+
+        this.nodeUsername   = nodeUsername;
+        this.nodePassword   = nodePassword;
 
         if (huobiProxyEnable) {
             Proxy proxy  = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(huobiProxyServer, huobiProxyPort));
@@ -133,6 +140,10 @@ public class HedgingServiceImpl implements HedgingService {
             httpService = new HttpService(node, client, false);
         } else {
             httpService = new HttpService(node);
+        }
+
+        if (!StringUtils.isEmpty(this.nodeUsername)) {
+            httpService.addHeader("Authorization", Credentials.basic(this.nodeUsername, this.nodePassword));
         }
 
         web3j = Web3j.build(httpService);

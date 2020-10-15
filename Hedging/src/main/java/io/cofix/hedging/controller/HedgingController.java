@@ -19,10 +19,8 @@ import io.cofix.hedging.utils.response.AccountsResponse;
 import io.cofix.hedging.utils.response.BalanceResponse;
 import io.cofix.hedging.vo.HedgingQuartzJob;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +32,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,8 +137,11 @@ public class HedgingController {
      */
     @TokenRequired
     @PostMapping("/updateNode")
-    public String updateNode(@RequestParam(name = "node") String node) {
-        hedgingService.UpdateNode(node);
+    public String updateNode(@RequestParam(name = "node") String node,
+                             @RequestParam(name = "nodeUsername", required = false) String nodeUsername,
+                             @RequestParam(name = "nodePassword", required = false) String nodePassword
+                             ) {
+        hedgingService.UpdateNode(node, nodeUsername, nodePassword);
         return node;
     }
 

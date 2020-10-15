@@ -62,7 +62,9 @@
 
         <label>Setting up ethereum nodes (required): </label>
         <form id="updateNode">
-            <input type="text" name="node" id="node" autocomplete="off">
+            <input type="text" name="node" id="node" autocomplete="off" size="60%" placeholder="web3 node URL(required)">
+            <input type="text" name="nodeUsername" id="nodeUsername" size="20%" placeholder="node user name">
+            <input type="text" name="nodePassword" id="nodePassword" size="20%" placeholder="node password">
             <input type="button" onclick="updateNode()" value="Submit"/>
         </form>
 
@@ -85,32 +87,26 @@
             <form id="addTransactionPool">
 
                 <label>Enter Huobi trading pairs (required):</label>
-                <p></p>
                 <input type="text" name="tradingPairs" id="tradingPairs" autocomplete="off">
                 <p></p>
                 <label>Enter erc20 token contract address (required):</label>
-                <p></p>
                 <input type="text" name="token" id="token" autocomplete="off">
                 <p></p>
                 <label>Enter huobi API-KEY (required)</label>
-                <p></p>
                 <input type="text" name="apiKey" autocomplete="off">
                 <p></p>
                 <label>Enter huobi API-SECRET (required)</label>
-                <p></p>
                 <input type="text" name="apiSecret" autocomplete="off">
                 <p></p>
                 <label>Enter eth threshold (not required,The default is 1 eth)</label>
-                <p></p>
                 <input type="text" name="ethThreshold" id="ethThreshold" autocomplete="off">
                 <p></p>
                 <label>Enter erc20 threshold (not required,The default is 1 erc20)</label>
-                <p></p>
                 <input type="text" name="erc20Threshold" id="erc20Threshold" autocomplete="off">
                 <p></p>
                 <label>Click Submit to add a trade pool, and you can add multiple trade pools in turn</label>
-                <p></p>
                 <input type="button" onclick="addTransactionPool()" value="Submit"/>
+<!--                <p/>-->
             </form>
         <p class="line"></p>-->
 

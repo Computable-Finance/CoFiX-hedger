@@ -8,7 +8,7 @@ public interface TradeMarketService {
 
     long sendBuyMarketOrder(String symbol, String amount);
 
-    Order getOrderById(long orderId, String accessKey, String secretKey);
+    Order getOrderById(Long orderId, String accessKey, String secretKey);
 
     long cancelOrder(long orderId);
 }

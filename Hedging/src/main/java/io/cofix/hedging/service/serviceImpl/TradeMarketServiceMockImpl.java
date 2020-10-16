@@ -21,7 +21,7 @@ public class TradeMarketServiceMockImpl implements TradeMarketService {
     }
 
     @Override
-    public Order getOrderById(long orderId, String apiKey, String secretKey) {
+    public Order getOrderById(Long orderId, String apiKey, String secretKey) {
         return new Order();
     }
 

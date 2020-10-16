@@ -4,7 +4,7 @@
 ## CoFiX Hedge program
 **Background**
 
-CoFiX is a novel type of AMM that allows market makers to provide liquidity with a calculable risk. To manage this risk, a market maker must hedge their position on an OTC service to lock in profits by mirroring the trades that occur in their CoFiX liquidity pool, proportional to their share of the pool. By doing so, a market maker can eliminate negative fluctuations and ensure that their position in a pool is always in  a state of growth, regardless of the market price.  
+CoFiX is a novel type of AMM that allows market makers to provide liquidity with a calculable risk. To manage this risk, a market maker needs to hedge their position in other market to lock in profits by mirroring the trades that occur in their CoFiX liquidity pool, proportional to their share of the pool. By doing so, a market maker can eliminate negative fluctuations and ensure that their position in a pool is always in  a state of growth, regardless of the market price.  
 
 This repo provides a basic tool for market makers to hedge but there can be multiple ways to do it. 
 

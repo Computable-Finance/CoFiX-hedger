@@ -27,11 +27,13 @@ public class TradeMarketServiceHuobiImpl implements TradeMarketService {
     }
 
     @Override
-    public Order getOrderById(long orderId, String apiKey, String secretKey) {
+    public Order getOrderById(Long orderId, String apiKey, String secretKey) {
 /*
         String apiKey = transactionService.getApiKey();
         String secretKey = transactionService.getSecretKey();
 */
+        if (null == orderId) return null;
+
         Order order = null;
         try {
             order = HuobiUtil.getOrder(orderId, apiKey, secretKey);

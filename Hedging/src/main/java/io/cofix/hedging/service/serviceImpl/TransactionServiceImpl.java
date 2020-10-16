@@ -143,13 +143,28 @@ public class TransactionServiceImpl implements TransactionService {
         return API_SECRET;
     }
 
+    private String getApiKey(final String symbol) {
+        HedgingPool hedgingPool = getHedgingPoolBySymbol(symbol);
+        if ((null == hedgingPool) || (StringUtils.isEmpty(hedgingPool.getApiKey())) || (StringUtils.isEmpty(hedgingPool.getSecretKey()))) {
+            return getApiKey();
+        } else {
+            return hedgingPool.getApiKey();
+        }
+    }
+
+    private String getSecretKey(final String symbol) {
+        HedgingPool hedgingPool = getHedgingPoolBySymbol(symbol);
+        if ((null == hedgingPool) || (StringUtils.isEmpty(hedgingPool.getApiKey())) || (StringUtils.isEmpty(hedgingPool.getSecretKey()))) {
+            return getSecretKey();
+        } else {
+            return hedgingPool.getSecretKey();
+        }
+    }
 
     // Market selling order (e.g. trade to HTUSDT, sell HT to get USDT)
     @Override
     public Long sendSellMarketOrder(String symbol, String amount) {
-        HedgingPool hedgingPool = getHedgingPoolBySymbol(symbol);
-
-        ApiClient client = new ApiClient(hedgingPool.getApiKey(), hedgingPool.getSecretKey());
+        ApiClient client = new ApiClient(getApiKey(symbol), getSecretKey(symbol));
         AccountsResponse accounts = client.accounts();
         Long orderId = -1L;
         List<Accounts> list = (List<Accounts>) accounts.getData();
@@ -181,9 +196,8 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public Long sendBuyMarketOrder(String symbol, String amount) {
-        HedgingPool hedgingPool = getHedgingPoolBySymbol(symbol);
+        ApiClient client = new ApiClient(getApiKey(symbol), getSecretKey(symbol));
 
-        ApiClient client = new ApiClient(hedgingPool.getApiKey(), hedgingPool.getSecretKey());
         AccountsResponse accounts = client.accounts();
         Long orderId = -1L;
         List<Accounts> list = (List<Accounts>) accounts.getData();

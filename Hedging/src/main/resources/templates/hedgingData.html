@@ -27,9 +27,14 @@
                     <label>[[${m.huobiTradingPair}]]：</label>
                     <input type="hidden" name="huobiTradingPair" th:value="${m.huobiTradingPair}">
                     <p></p>
-                    &nbsp;&nbsp;&nbsp;&nbsp;The eth threshold = <input type="text" name="unitEthThreshold" th:value="${m.unitEthThreshold()}" style="width: 200px;"> ;
+                    &nbsp;&nbsp;&nbsp;&nbsp;The eth threshold = <input type="text" name="unitEthThreshold"
+                                                                       th:value="${m.unitEthThreshold()}"
+                                                                       style="width: 200px;"> ;
                     <p></p>
-                    &nbsp;&nbsp;&nbsp;&nbsp;The [[${m.tokenName}]] threshold = <input type="text" name="unitErc20Threshold" th:value="${m.unitErc20Threshold()}" style="width: 200px;"> ;
+                    &nbsp;&nbsp;&nbsp;&nbsp;The [[${m.tokenName}]] threshold = <input type="text"
+                                                                                      name="unitErc20Threshold"
+                                                                                      th:value="${m.unitErc20Threshold()}"
+                                                                                      style="width: 200px;"> ;
                     <p></p>
                     &nbsp;&nbsp;&nbsp;The Huoib's API KEY = [[${m.apiKey}]];
                     <p></p>
@@ -45,7 +50,8 @@
                     <p></p>
                     &nbsp;&nbsp;&nbsp;&nbsp;The Delta [[${m.tokenName}]] = [[${m.unitDeltaErc20()}]];
                     <P></P>
-                    <input type="button" th:onclick="updateThreshold([[${m.huobiTradingPair}]])" value="UpdateThreshold" style="margin-left: 100px;"/>
+                    <input type="button" th:onclick="updateThreshold([[${m.huobiTradingPair}]])" value="UpdateThreshold"
+                           style="margin-left: 100px;"/>
                 </form>
             </li>
         </ol>
@@ -60,14 +66,6 @@
         <p></p>
         <p class="line"></p>
 
-        <label>Setting up ethereum nodes (required): </label>
-        <form id="updateNode">
-            <input type="text" name="node" id="node" autocomplete="off" size="60%" placeholder="web3 node URL(required)">
-            <input type="text" name="nodeUsername" id="nodeUsername" size="20%" placeholder="node user name">
-            <input type="text" name="nodePassword" id="nodePassword" size="20%" placeholder="node password">
-            <input type="button" onclick="updateNode()" value="Submit"/>
-        </form>
-
         <label>Set up a marketmaker account address (required): </label>
         <form id="updateAddress">
             <input type="text" name="address" id="address" autocomplete="off">
@@ -75,15 +73,43 @@
         </form>
 
         <p class="line"></p>
-
-        <label>Set the network agent address and port (not required): </label>
-        <form id="updateProxy">
-            <input type="text" name="proxyIp" id="proxyIp" autocomplete="off" placeholder="Proxy IP, default is 127.0.0.1">
-            <input type="text" name="proxyPort" id="proxyPort" autocomplete="off" placeholder="Proxy port, default is 0">
-            <input type="button" onclick="updateProxy()" value="Submit"/>
+        <form id="updateExchangeApiKey">
+            <label>Enter huobi API-KEY (required)</label>
+            <!--            <p></p>-->
+            <input type="text" name="apiKey" autocomplete="off">
+            <p></p>
+            <label>Enter huobi API-SECRET (required)</label>
+            <!--            <p></p>-->
+            <input type="text" name="apiSecret" autocomplete="off">
+            <p></p>
+            <input type="button" onclick="updateExchangeApiKey()" value="Submit"/>
         </form>
 
         <p class="line"></p>
+
+        <p/>
+        <div id="advance">^^^^^^ADVANCE OPTIONS^^^^^^</div>
+        <p class="line"/>
+        <div id="optional" style="display: none">
+            <label>Set the network agent address and port (not required): </label>
+            <form id="updateProxy">
+                <input type="text" name="proxyIp" id="proxyIp" autocomplete="off"
+                       placeholder="Proxy IP, default is 127.0.0.1">
+                <input type="text" name="proxyPort" id="proxyPort" autocomplete="off"
+                       placeholder="Proxy port, default is 0">
+                <input type="button" onclick="updateProxy()" value="Submit"/>
+            </form>
+
+            <label>Setting up ethereum nodes (required): </label>
+            <form id="updateNode">
+                <input type="text" name="node" id="node" autocomplete="off" size="60%"
+                       placeholder="web3 node URL(required)">
+                <input type="text" name="nodeUsername" id="nodeUsername" size="20%" placeholder="node user name">
+                <input type="text" name="nodePassword" id="nodePassword" size="20%" placeholder="node password">
+                <input type="button" onclick="updateNode()" value="Submit"/>
+            </form>
+
+            <p class="line"></p>
             <form id="addTransactionPool">
 
                 <label>Enter Huobi trading pairs (required):</label>
@@ -106,42 +132,27 @@
                 <p></p>
                 <label>Click Submit to add a trade pool, and you can add multiple trade pools in turn</label>
                 <input type="button" onclick="addTransactionPool()" value="Submit"/>
-<!--                <p/>-->
+                <!--                <p/>-->
             </form>
-        <p class="line"></p>-->
+            <p class="line"></p>-->
 
 
-        <label>Set the hedging interval(default: 20s): </label>
-        <form id="updateInterval">
-            <input type="number" name="interval" id="interval" autocomplete="off">
-            <input type="button" onclick="updateInterval()" value="Submit"/>
-        </form>
-
-
-<!--
+            <label>Set the hedging interval(default: 20s): </label>
+            <form id="updateInterval">
+                <input type="number" name="interval" id="interval" autocomplete="off">
+                <input type="button" onclick="updateInterval()" value="Submit"/>
+            </form>
         <p class="line"></p>
-        <form id="updateExchangeApiKey">
-            <label>Enter huobi API-KEY (required)</label>
-            <p></p>
-            <input type="text" name="apiKey" autocomplete="off">
-            <p></p>
-            <label>Enter huobi API-SECRET (required)</label>
-            <p></p>
-            <input type="text" name="apiSecret" autocomplete="off">
-            <p></p>
-            <input type="button" onclick="updateExchangeApiKey()" value="Submit"/>
-        </form>
--->
 
-        <p class="line"></p>
-<!--
-        <form id="updatePasswd">
-            <label>Enter user password</label>
-            <p></p>
-            <input type="text" name="userPasswd" id="userPasswd" autocomplete="off">
-            <input type="button" onclick="updatePasswd()" value="Submit"/>
-        </form>
--->
+        </div>
+        <!--
+                <form id="updatePasswd">
+                    <label>Enter user password</label>
+                    <p></p>
+                    <input type="text" name="userPasswd" id="userPasswd" autocomplete="off">
+                    <input type="button" onclick="updatePasswd()" value="Submit"/>
+                </form>
+        -->
     </div>
 
     <p class="line"/>
@@ -157,25 +168,34 @@
     let node = '[[${node}]]';
     let address = '[[${address}]]';
 
-    function updateThreshold(id){
+    $('#advance').click(function () {
+        const opt = $('#optional');
+        if (opt.css('display') == 'none') {
+            opt.show();
+        } else {
+            opt.hide();
+        }
+    })
+
+    function updateThreshold(id) {
         $.ajax({
-            type:"POST",
-            url:"/hedging/updateThreshold",
-            data:$('#'+id).serialize(),
+            type: "POST",
+            url: "/hedging/updateThreshold",
+            data: $('#' + id).serialize(),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('token', localStorage.getItem('token'));
             },
-            success:function(result){
+            success: function (result) {
                 location.replace(location);
             },
-            error:function(){
+            error: function () {
                 alert("Error !!")
             }
         })
     }
 
 
-    function addTransactionPool(){
+    function addTransactionPool() {
 
         if (!node) {
             alert("Please set the node first");
@@ -188,16 +208,16 @@
         }
 
         $.ajax({
-            type:"POST",
-            url:"/hedging/addTransactionPool",
-            data:$('#addTransactionPool').serialize(),
+            type: "POST",
+            url: "/hedging/addTransactionPool",
+            data: $('#addTransactionPool').serialize(),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('token', localStorage.getItem('token'));
             },
-            success:function(result){
+            success: function (result) {
                 location.replace(location);
             },
-            error:function(){
+            error: function () {
                 alert("Error !!")
             }
         })
@@ -227,18 +247,18 @@
         })
     }
 
-    function updateExchangeApiKey(){
+    function updateExchangeApiKey() {
         $.ajax({
-            type:"POST",
-            url:"/hedging/updateExchangeApiKey",
-            data:$('#updateExchangeApiKey').serialize(),
+            type: "POST",
+            url: "/hedging/updateExchangeApiKey",
+            data: $('#updateExchangeApiKey').serialize(),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('token', localStorage.getItem('token'));
             },
-            success:function(result){
+            success: function (result) {
                 location.replace(location);
             },
-            error:function(){
+            error: function () {
                 alert("Please enter the correct API-Key !!")
             }
         })

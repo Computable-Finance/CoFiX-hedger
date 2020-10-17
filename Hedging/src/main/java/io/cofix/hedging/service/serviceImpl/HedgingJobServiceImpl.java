@@ -118,12 +118,6 @@ public class HedgingJobServiceImpl implements HedgingJobService {
             return;
         }
 
-        // If none of the thresholds are reached, no processing is required
-        if ((deltaEth.abs().compareTo(hedgingPool.getEthThreshold()) < 0) &&
-                (deltaErc20.abs().compareTo(hedgingPool.getErc20Threshold()) < 0)) {
-            return;
-        }
-
         Order   orderOld = tradeMarketService.getOrderById(hedgingPool.getOrderId(), hedgingPool.getApiKey(), hedgingPool.getSecretKey());
         if ((orderOld != null) && (!ORDER_DONE.equals(orderOld.getState()))) {
             // Order is pending, no more action.
@@ -138,6 +132,12 @@ public class HedgingJobServiceImpl implements HedgingJobService {
         // This is new delta ACC.
         BigDecimal deltaAccEth = hedgingPool.getDeltaEth();
         BigDecimal deltaAccErc20 = hedgingPool.getDeltaErc20();
+
+        // If none of the thresholds are reached, no processing is required
+        if ((deltaAccEth.abs().compareTo(hedgingPool.getEthThreshold()) < 0) &&
+                (deltaAccErc20.abs().compareTo(hedgingPool.getErc20Threshold()) < 0)) {
+            return;
+        }
 
         // Now you can start hedging
 /*

@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.cofix</groupId>
     <artifactId>CoFiX-Hedging</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
 <!--    <name>hedging</name>-->
     <description>CoFiX Hedging project</description>
 

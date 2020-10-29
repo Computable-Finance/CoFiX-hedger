@@ -24,7 +24,7 @@ This hedging program implements a strategy for automated hedging according to th
 
 **Run start**
 
-1. Run the project:  windows: double-click the **run.bat** file (Linux/MacOS: execute **./run.sh**) under the project path. When running the project, a window will pop up (please do not close it). You can view the log information in the window, or in the log files under the logs folder.
+1. Run the project:  windows: double-click the **run.bat** file (Linux/MacOS: execute **./run.sh**) under the project path. When running the project, a window will pop up (please do not close it). You can view the log information in the window, or in the log files under the logs folder. These files are located in [releases](https://github.com/Computable-Finance/CoFiX-hedger/releases)
 2. log in:
 - Enter http://127.0.0.1 in the browser to enter the login page, with the default user name **cofix**, and password **&UJM6yhn**.
 - If you need to modify the password, you can modify **cofix.user.name** (user name) and **confix.user.password** (password) in the configuration file: **co-fi-x-hedging/Hedging/src/main/resources/application.properties**.
